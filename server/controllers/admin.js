@@ -11,7 +11,7 @@ exports.EditUserOrder = async(req,res,next)=>{
 }
 
 // route.get('/admin/orders');
-exports.ListAdminOrder = async()=>{
+exports.ListAdminOrder = async(req,res,next)=>{
     try {
         //code
 
