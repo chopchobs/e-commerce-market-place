@@ -5,11 +5,16 @@ const { AddProduct,
         ListProduct,
         ListProductByFilters, 
         RemoveProduct, 
-        SearchFilters } = require('../controllers/product');
+        SearchFilters, 
+        UpdateProduct,
+        ReadProduct,
+        } = require('../controllers/product');
 
 // step 3 : define routes
 router.post('/product', AddProduct);
-router.get('/product/:id', ListProduct);
+router.get('/products/:count', ListProduct);
+router.get('/product/:id', ReadProduct);
+router.put('/product/:id',UpdateProduct);
 router.delete('/product/:id', RemoveProduct);
 router.post('/product-by', ListProductByFilters);
 router.post('/search/filters', SearchFilters );
