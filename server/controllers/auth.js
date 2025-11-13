@@ -76,7 +76,7 @@ exports.login = async(req, res, next) => {
                 if (err) {
                 return res.status(500).json({ message:'Server Error!!' })
                 }
-                res.json({ payload,token })
+                res.status(200).json({ payload,token })
          })
     } catch (error) {
         next(error);
@@ -89,7 +89,7 @@ exports.currentUser = async(req, res, next) => {
     try {
         // code
 
-        res.send({ message: 'Current User fetched successfully' });
+        res.status(200).send({ message: 'Current User fetched successfully' });
     } catch (error) {
         next(error);
         res.status(500).json({ message: 'Failed to fetch current User' });
@@ -101,7 +101,7 @@ exports.currentAdmin = async(req, res, next) => {
     try {
         // code
 
-        res.json({ message: 'Current Admin fetched successfully' });
+        res.status(200).send({ message: 'Current Admin fetched successfully' });
     } catch (error) {
         next(error);
         res.status(500).json({ message: 'Failed to fetch current Admin' });
