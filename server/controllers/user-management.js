@@ -19,7 +19,6 @@ exports.AddChangeStatus = (req,res,next)=>{
     } catch (error) {
         next(error);
         res.status(500).json({message:'Failed to Add Change Status'})
-
     }
 }
 
