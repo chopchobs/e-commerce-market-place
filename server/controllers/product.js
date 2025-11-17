@@ -1,53 +1,53 @@
 const prisma = require("../config/prisma");
 
-// Create product - POST
+// Create - POST
 exports.AddProduct = async(req, res, next) => {
     try {
-     // code
-    const {title,description,price,quantity,categoryId,images} = req.body;
+     // CREATE
+    const { title,description,price,
+            quantity,categoryId,images} = req.body;
     const CreateProduct = await prisma.product.create({
         data:{
-            title:title,
-            description:description,
-            price:parseFloat(price),
-            quantity:parseInt(quantity),
-            categoryId:parseFloat(categoryId),
-            images:{
-                create:images.map((item)=>{
-                    asset_id:item.asset_id   
-                    public_id:item.public_id
-                    url:item.url       
-                    secure_url:item.secure_url
+            title: title,
+            description: description,
+            price: parseFloat(price),
+            quantity: parseInt(quantity),
+            categoryId: parseFloat(categoryId),
+            images:{ // create - .map
+                create:images.map( (item) =>{
+                    asset_id: item.asset_id 
+                    public_id: item.public_id
+                    url: item.url       
+                    secure_url: item.secure_url
                 })
             }
         }
     })
-        // console.log(CreateProduct)
         res.status(200).send({
             CreateProduct,
-             message: 'Create Product successfully' });
+            message: 'Create Product successfully' });
     } catch (error) {
         next(error);
         res.status(500).json({ message: 'Failed to Create Product' });
     }
 };
 
-// Get product - GET,count
+// LIST:Count  - GET
 exports.ListProduct = async(req, res, next) => {
     try {
-        // code
+        // FindMany
         const { count }= req.params;
         const ListProducts = await prisma.product.findMany({
-            take: parseInt(count),
+            take: parseInt( count ),
             orderBy: { createdAt:'asc' },
-            include: {
-                category:true,
-                images:true,
+            include: { 
+                category: true,
+                images: true,
             }
         });
         res.status(200).send({ 
             ListProducts, 
-            message: 'Get Product Successfully' });
+            message: 'Fetch Product Successfully' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to Fetch Product' });
@@ -55,7 +55,7 @@ exports.ListProduct = async(req, res, next) => {
 };
 
 // Read - GET,iD
-exports.ReadProduct = async(req,res,next)=>{
+exports.ReadProduct = async (req,res,next)=>{
     try {
         //code
         const { id }= req.params;
@@ -74,19 +74,20 @@ exports.ReadProduct = async(req,res,next)=>{
         })
     } catch (error) {
         next(error);
-        res.status(500).send({message:'Failed Read Product!!'})
+        res.status(500).send ({message:'Failed Read Product!!'})
     }
 }
 
 // Update - PUT,iD
-exports.UpdateProduct = async(req,res,next)=>{
+exports.UpdateProduct = async (req,res,next)=>{
     try {
        //code
-       const {id} = req.params;
-        const { title,description,price,quantity,categoryId,images }=req.body;
+       const { id } = req.params;
+        const { title,description,price,
+                quantity,categoryId,images } = req.body;
         await prisma.image.deleteMany({
             where:{
-                productId:Number(id),
+                productId: Number(id),// OrCart,Order
             }
         })
         const UpdateProducts = await prisma.product.update({
@@ -141,10 +142,10 @@ exports.RemoveProduct = async (req, res, next) => {
 exports.ListProductByFilters = async(req, res, next) => {
     try {
         // code
-        const {sort,order,limit} = req.body;
+        const { sort,order,limit } = req.body;
         const ListFilters = await prisma.product.findMany({
             take:limit,
-            orderBy:{[sort]:order},
+            orderBy:{ [sort]:order},
             include:{category:true},
         })  
         res.status(200).json({ 
@@ -158,14 +159,94 @@ exports.ListProductByFilters = async(req, res, next) => {
     }
 };
 
-// Search Filters - POST
-exports.SearchFilters = (req, res, next) => {
+// ------- Handle -------
+    // handle Query ( ประเภท )
+    const hldQuery = async (req,res,query)=>{
+        try {
+            //code
+            const products = await prisma.product.findMany({
+                where:{
+                    title:{
+                        contains: query, //contains - มีคำนี้อยู่ภายในข้อความ
+                    }
+                },include:{
+                    category:true,
+                    images:true,
+                }
+            })
+            res.status(200).send({
+                products, 
+                message:'handleQuery',
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
+    // handle Price [ น้อย,มาก ]
+    const hldPrice = async (req,res,priceRange)=>{
+        try {
+            const hldPrice = await prisma.product.findMany({
+                where:{
+                    price:{
+                        gte:priceRange[0],
+                        lte:priceRange[1],
+                    }
+                },include:{
+                    category:true,
+                    images:true,
+                }
+            })
+            res.status(200).send({
+                hldPrice,
+                message:'Price',
+            })
+        } catch (error) {
+            res.status(400).send(error)
+        }
+    }
+    // handle Category ( id )
+    const hldCategory = async (req,res,categoryId)=>{
+        try {
+        // code
+        const hldCategory = await prisma.product.findMany({
+            where:{
+                categoryId:{
+                    in: categoryId.map(( id )=> Number( id ))
+                }
+            },include:{
+                category:true,
+                images:true,
+            }
+        })
+        res.status(200).send({
+            hldCategory,
+            message:'Category',
+        })
+        } catch (error) {
+            res.status(400).send(error)
+        }
+    }
+// --------------
+exports.SearchFilter = async(req, res, query) => {
     try {
         // code
-        console.log (req.params.id)
-        res.send({ message: 'Search Product Successfully' });
+        const { query,price,category } = req.body;
+        if (query) {
+            console.log('Query:',query)
+            await hldQuery (req,res,query)
+        }
+        if (price) {
+            console.log('Price:',price)
+            await hldPrice (req,res,price)
+        } 
+        if (category) {
+            console.log('Category',category)
+            await hldCategory(req,res,category)
+        }
+        // res.send({ message: 'Search Product Successfully' });
     } catch (error) {
         next(error);
-        res.status(500).json({ message: 'Failed to Search Product ' });
+        res.status(500).json({
+             message: 'Failed to Search Product ' });
     }
 };
