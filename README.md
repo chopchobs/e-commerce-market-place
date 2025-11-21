@@ -22,9 +22,11 @@
 | Endpoint                            | Method | Description            | Body                                                                                  |
 |-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
 | `/api/product`                      | POST   | Create product          | `{ "title": "TEST", "description": "test", "price": 10000, "quantity": 20, "categoryId": 2, "images": [] }` |
-| `/api/product/:id`                  | GET    | Get product by ID       | None                                                                                  |
+| `/api/products/:count`                  | GET    | List product by ID       | None                                                                                  |
+| `/api/product/:id`                  | GET    | Read product by ID       | None                                                                                  |
+| `/api/product/:id`                  | PUT    | Update product by ID       | None                                                                                  |
 | `/api/product/:id`                  | DELETE | Delete product by ID    | None                                                                                  |
-| `/api/productby`                    | POST   | Get products by filters | `{ "sort": "price", "order": "asc", "limit": 2 }` or `{ "sort": "quantity", "order": "desc", "limit": 2 }` |
+| `/api/product-by`                    | POST   | Get products by filters | `{ "sort": "price", "order": "asc", "limit": 2 }` or `{ "sort": "quantity", "order": "desc", "limit": 2 }` |
 | `/api/search/filters`               | POST   | Search with filters     | `{ "query": "mouse" }`, `{ "price": [100, 600] }`, or `{ "category": [1, 2] }`        |
 
 ## User Management
