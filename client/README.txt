@@ -6,12 +6,13 @@ npm create vite@latest
 >npm run dev
 
 npm i react-router-dom
+npm install sonner
+npm install zustand
+
 npm install @radix-ui/themes
-npm i zustand axios
 npm install @react-oauth/google@latest
 
 npm i react-image-file-resizer
-npm i react-toastify
 npm i react-icons
 npm i lucide-react
 npm i lodash
