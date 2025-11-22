@@ -1,5 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
+
 const Register = () => {
   // JS
   const [Form, setForm] = useState({
@@ -17,17 +20,19 @@ const Register = () => {
     });
   };
   const hldSubmitInform = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // not reset
     if (Form.password !== Form.confirmPassword) {
-      return alert("Password is not match !!");
+      return toast.warning("Password is not match !!");
     }
+    // TO DB
     try {
-      const resFront = await axios.post(
-        "http://localhost:5001/api/register",
-        Form
-      );
+      const res = await axios.post("http://localhost:5001/api/register", Form);
+      // console.log(resFront.data);
+      toast.success(res.data.message); // ✅
     } catch (error) {
-      console.log(error);
+      const errMessage = error?.response?.data?.message;
+      // console.log(errMessage);
+      toast.error(errMessage); // ⛔️
     }
   };
   return (
@@ -44,6 +49,7 @@ const Register = () => {
             Create your account to start shopping
           </p>
         </div>
+        {/* FORM */}
         <form className="mt-8 space-y-10" onSubmit={hldSubmitInform}>
           <div className="space-y-5">
             {/* Email Field */}
@@ -109,12 +115,12 @@ const Register = () => {
             {/* Link to Login */}
             <div className="text-center text-sm">
               <span className="text-gray-500">Already have an account? </span>
-              {/* <Link
-                to="login"
+              <Link
+                to="/login"
                 className="font-medium text-black hover:underline"
               >
                 Log in
-              </Link> */}
+              </Link>
             </div>
           </div>
         </form>
