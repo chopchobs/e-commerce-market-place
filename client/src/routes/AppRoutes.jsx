@@ -14,6 +14,9 @@ import Category from "../pages/admin/Category";
 import Product from "../pages/admin/product";
 import LayoutUser from "../layouts/LayoutUser";
 import HomeUser from "../pages/user/HomeUser";
+import ProtectRouteUser from "./ProtectRouteUser";
+import ProtectRouteAdmin from "./ProtectRouteAdmin";
+import Manage from "../pages/admin/Manage";
 
 const router = createBrowserRouter([
   {
@@ -32,22 +35,24 @@ const router = createBrowserRouter([
     ],
   },
   {
-    // admin
+    // admin -  Protect ☕️
     path: "/admin",
-    element: <LayoutAdmin />,
+    element: <ProtectRouteAdmin element={<LayoutAdmin />} />,
     children: [
       { index: true, element: <Dashboard /> },
       { path: "category", element: <Category /> },
       { path: "product", element: <Product /> },
+      { path: "manage", element: <Manage /> },
     ],
   },
   {
-    // user
+    // User -  Protect 🐽
     path: "/user",
-    element: <LayoutUser />,
+    element: <ProtectRouteUser element={<LayoutUser />} />,
     children: [{ index: true, element: <HomeUser /> }],
   },
 ]);
+
 const AppRoutes = () => {
   return (
     <>

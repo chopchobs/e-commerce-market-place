@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 const ecomStore = (set) => ({
   user: null,
   token: null,
+  // user , token 🌎
   actionLogin: async (Data) => {
     const res = await axios.post("http://localhost:5001/api/login", Data);
     console.log(res);

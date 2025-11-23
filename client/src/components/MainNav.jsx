@@ -55,7 +55,7 @@ const MainNav = () => {
               {/* Login: ปุ่มแบบ Ghost (ไม่มีพื้นหลัง) */}
               <Link
                 to={"login"}
-                className="group relative hidden sm:block text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                className="group rela hidden sm:block text-sm font-medium text-gray-700 hover:text-black transition-colors"
               >
                 <span className="font-medium text-sm">LOGIN</span>
                 <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all group-hover:w-full"></span>
