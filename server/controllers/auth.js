@@ -92,8 +92,22 @@ exports.login = async (req, res, next) => {
 exports.currentUser = async (req, res, next) => {
   try {
     // code
+    const { id, role, email } = req.user;
+    const user = await prisma.user.findFirst({
+      where: { email: email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
 
-    res.status(200).send({ message: "Current User fetched successfully" });
+    // console.log(user);
+    res.status(200).json({
+      user,
+      message: "Current User fetched successfully",
+    });
   } catch (error) {
     next(error);
     res.status(500).json({ message: "Failed to fetch current User" });
@@ -104,8 +118,21 @@ exports.currentUser = async (req, res, next) => {
 exports.currentAdmin = async (req, res, next) => {
   try {
     // code
-
-    res.status(200).send({ message: "Current Admin fetched successfully" });
+    const { email } = req.user;
+    const admin = await prisma.user.findFirst({
+      where: { email: email, role: "admin" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    console.log(admin);
+    res.status(200).json({
+      admin,
+      message: "Current Admin fetched successfully",
+    });
   } catch (error) {
     next(error);
     res.status(500).json({ message: "Failed to fetch current Admin" });

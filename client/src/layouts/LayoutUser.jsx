@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
+import MainNav from "../components/MainNav";
 
 const LayoutUser = () => {
   return (
-    <div>
-      <h1>Slide Bar</h1>
-      <h1>Head Bar</h1>
-      <hr />
-      <Outlet />
-    </div>
+    <>
+      <MainNav />
+      <main>
+        <Outlet />
+      </main>
+    </>
   );
 };
 export default LayoutUser;
