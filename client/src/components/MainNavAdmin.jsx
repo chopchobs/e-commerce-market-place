@@ -4,10 +4,11 @@ import { ShoppingCart, User, Hexagon } from "lucide-react";
 const MainNav = () => {
   return (
     // 1. Navbar Container: พื้นหลังขาวโปร่งแสง + เส้นขอบ Slate อ่อนๆ
-    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-xl transition-all duration-300">
+    <nav className="sticky  top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-xl transition-all duration-300">
       {/* 2. Inner Content Wrapper */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+      {/* max-w-7xl px-4 sm:px-6 lg:px-8 */}
+      <div className="mx-auto px-30 sm:px-6 lg:px-8 ">
+        <div className="flex h-20 justify-between">
           {/* --- Left Section: Logo & Main Links --- */}
           <div className="flex items-center gap-12">
             {/* LOGO: ใช้ Icon Hexagon สี Indigo เข้าชุดกับ Admin */}
@@ -75,11 +76,11 @@ const MainNav = () => {
               {/* Register Button: แบบ Primary (Indigo Theme) */}
               <Link
                 to={"register"}
-                className="relative overflow-hidden rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:scale-105 hover:bg-indigo-700 hover:shadow-indigo-500/50 active:scale-95"
+                className="group relative overflow-hidden rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:scale-105 hover:bg-indigo-700 hover:shadow-indigo-500/50 active:scale-95"
               >
                 <span className="relative z-10">Register</span>
                 {/* Shine Effect (Optional) */}
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
+                <div className="absolute inset-0 -translate-x-full group-hover:animate-shimmer bg-linear-to-r from-transparent via-white/20 to-transparent" />
               </Link>
             </div>
           </div>
@@ -88,5 +89,5 @@ const MainNav = () => {
     </nav>
   );
 };
-
+// bg - gradient - to - r;
 export default MainNav;
