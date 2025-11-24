@@ -8,8 +8,8 @@ import {
   LogOut,
   Hexagon,
 } from "lucide-react";
-import SideBarLink from "../sildebar/SildebarLink";
-import SideBarButton from "../sildebar/SideBarButton";
+import SideBarButton from "../sidebar/SideBarButton";
+import SideBarLink from "../sidebar/SildeBarLink";
 
 // Main Sidebar Component
 const AdminSidebar = () => {

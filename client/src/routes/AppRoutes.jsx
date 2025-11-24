@@ -10,13 +10,13 @@ import Register from "../pages/auth/Register";
 import Layout from "../layouts/Layout";
 import LayoutAdmin from "../layouts/LayoutAdmin";
 import Dashboard from "../pages/admin/Dashboard";
-import Category from "../pages/admin/Category";
 import Product from "../pages/admin/product";
 import LayoutUser from "../layouts/LayoutUser";
 import HomeUser from "../pages/user/HomeUser";
 import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
 import Manage from "../pages/admin/Manage";
+import FormCategory from "../components/admin/FormCategory";
 
 const router = createBrowserRouter([
   {
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     element: <ProtectRouteAdmin element={<LayoutAdmin />} />,
     children: [
       { index: true, element: <Dashboard /> },
-      { path: "category", element: <Category /> },
+      { path: "category", element: <FormCategory /> },
       { path: "product", element: <Product /> },
       { path: "manage", element: <Manage /> },
     ],
