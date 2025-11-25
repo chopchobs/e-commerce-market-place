@@ -11,8 +11,10 @@ import useEcomStore from "../../store/ecom-store";
 const FormCategory = () => {
   // --- Store & State ---
   const token = useEcomStore((state) => state.token);
+  const categories = useEcomStore((state) => state.categories);
+  const fetchCategories = useEcomStore((state) => state.fetchCategories);
   const [name, setName] = useState("");
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // --- Initial Fetch ---
@@ -21,15 +23,7 @@ const FormCategory = () => {
   }, [token]);
 
   //  Main Logic Functions
-  const fetchCategories = async (token) => {
-    try {
-      const res = await ListCategory(token);
-      setCategories(res.data.ListName);
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to fetch categories");
-    }
-  };
+
   // handleSubmit - form
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,7 +58,6 @@ const FormCategory = () => {
       toast.error("Delete failed");
     }
   };
-
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden font-sans">
       {/* 1. Header Section */}
