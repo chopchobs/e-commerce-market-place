@@ -17,6 +17,7 @@ import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
 import Manage from "../pages/admin/Manage";
 import FormCategory from "../components/admin/FormCategory";
+import FormProducts from "../components/admin/FormProducts";
 
 const router = createBrowserRouter([
   {
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "category", element: <FormCategory /> },
-      { path: "product", element: <Product /> },
+      { path: "product", element: <FormProducts /> },
       { path: "manage", element: <Manage /> },
     ],
   },
