@@ -9,6 +9,7 @@ const ecomStore = (set) => ({
   token: null,
   categories: [],
   products: [],
+  // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
     const res = await axios.post("http://localhost:5001/api/login", Data);
     console.log(res);
@@ -19,6 +20,7 @@ const ecomStore = (set) => ({
     });
     return res;
   },
+  // Categories
   fetchCategories: async (token) => {
     try {
       const res = await ListCategory(token);
@@ -29,6 +31,7 @@ const ecomStore = (set) => ({
       console.log(error);
     }
   },
+  // Products
   listProduct: async (token, count) => {
     try {
       const res = await CountProducts(token, count);
@@ -40,8 +43,9 @@ const ecomStore = (set) => ({
     }
   },
 });
+
 const userPersist = {
-  //  ชื่อ Key ที่จะไปโผล่ใน LocalStorage
+  // Key's name for LocalStorage
   name: "E-commerce Store",
 };
 const useEcomStore = create(persist(ecomStore, userPersist));
