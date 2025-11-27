@@ -1,10 +1,11 @@
-
 ----------- Server ---------------
 npm init -y
 npm install express morgan cors nodemon 
 bcryptjs jsonwebtoken // Email, Password - token
 
----------------
+npm i cloudinary
+https://console.cloudinary.com/app/c-e15fd94742aea736f2d9b07ac3aefd/image/getting-started
+-------------------------
 MySQL
 prisma
 
@@ -14,7 +15,7 @@ npm install @prisma/client
 
 // Doc ใช้ในการสร้างและอัพเดตฐานข้อมูล
 npx prisma migrate dev --name ecom
----------------
+-------------------------
 
 
 // update Scheme
@@ -45,7 +46,6 @@ prisma
 -----------Server---------------
 npm init -y
 npm install express mongoose morgan body-parser cors nodemon socket.io
-npm i cloudinary
 npm install google-auth-library
 
 ------------Client--------------

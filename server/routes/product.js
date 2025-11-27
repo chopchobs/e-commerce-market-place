@@ -9,6 +9,8 @@ const {
   ReadProduct,
   ListProductByFilters,
   SearchFilter,
+  UploadImages,
+  RemoveImage,
 } = require("../controllers/product");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 
@@ -20,6 +22,9 @@ router.put("/product/:id", authCheck, adminCheck, UpdateProduct);
 router.delete("/product/:id", authCheck, adminCheck, RemoveProduct);
 router.post("/product-by", authCheck, adminCheck, ListProductByFilters);
 router.post("/search/filter", authCheck, adminCheck, SearchFilter);
+// Image - Add,delete
+router.post("/image", authCheck, adminCheck, UploadImages);
+router.delete("/removeImage", authCheck, adminCheck, RemoveImage);
 
 // step 2 : create routes
 module.exports = router;

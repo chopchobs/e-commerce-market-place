@@ -1,5 +1,5 @@
 const prisma = require("../config/prisma");
-
+const cloudinary = require("cloudinary").v2; // cloudinary
 // Create - POST
 exports.AddProduct = async (req, res, next) => {
   try {
@@ -14,13 +14,12 @@ exports.AddProduct = async (req, res, next) => {
         quantity: parseInt(quantity),
         categoryId: parseFloat(categoryId),
         images: {
-          // create - .map
-          create: images.map((item) => {
-            asset_id: item.asset_id;
-            public_id: item.public_id;
-            url: item.url;
-            secure_url: item.secure_url;
-          }),
+          create: images.map((item) => ({
+            asset_id: item.asset_id,
+            public_id: item.public_id,
+            url: item.url,
+            secure_url: item.secure_url,
+          })),
         },
       },
     });
@@ -254,6 +253,56 @@ exports.SearchFilter = async (req, res, query) => {
     next(error);
     res.status(500).json({
       message: "Failed to Search Product ",
+    });
+  }
+};
+
+// Configuration - Cloudinary(.env)
+// https://console.cloudinary.com/app/c-e15fd94742aea736f2d9b07ac3aefd/image/getting-started
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_AIP_KEY,
+  api_secret: process.env.CLOUDINARY_AIP_SECRET,
+});
+
+// Upload an image
+// const uploadResult = await cloudinary.uploader.upload().catch((error) => {
+//   console.log(error);
+// });
+// console.log(uploadResult);
+
+// Image - Add
+exports.UploadImages = async (req, res, next) => {
+  try {
+    // json
+    const uploadResult = await cloudinary.uploader.upload(req.body.images, {
+      public_id: `Image Product-${Date.now()}`,
+      resource_type: "auto",
+      folder: "ImageProduct-Ecom",
+    });
+    console.log(req.body);
+    res.status(200).json({
+      uploadResult,
+    });
+  } catch (error) {
+    next(error);
+    res.status(500).json({
+      message: "Failed Upload !! ",
+    });
+  }
+};
+// Image - Delete
+exports.RemoveImage = async (req, res, next) => {
+  try {
+    // json
+
+    res.status(200).send({
+      message: "Remove Image successfully !! ",
+    });
+  } catch (error) {
+    next(error);
+    res.status(500).json({
+      message: "Failed Remove Image !! ",
     });
   }
 };

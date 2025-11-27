@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AddProduct } from "../../api/createProducts";
 import useEcomStore from "../../store/ecom-store";
 import { toast } from "sonner";
 import { Package, Trash2, Edit, Plus, Image as ImageIcon } from "lucide-react"; // แนะนำให้ลง lucide-react สำหรับไอคอน
+// utility
+import { formatCurrency } from "../utility/formatCurrency"; // สกุลเงิน
+import { getStockStatus } from "../utility/getStockStatus";
+import Uploadfile from "./Uploadfile";
 
 const ProductManagement = () => {
-  // Global State (Zustand)
+  // Global State (Zustand)🌎
   const token = useEcomStore((state) => state.token);
   const categories = useEcomStore((state) => state.categories);
   const fetchCategories = useEcomStore((state) => state.fetchCategories);
   const listProduct = useEcomStore((state) => state.listProduct);
   const products = useEcomStore((state) => state.products);
 
-  // Local State
+  // Local State 🎯
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -21,28 +25,25 @@ const ProductManagement = () => {
     categoryId: "",
     images: [],
   });
-
   useEffect(() => {
     // เรียกข้อมูลเมื่อ Component ถูกโหลด
     fetchCategories(token);
-    listProduct(token, 20); // เรียกมาสัก 20 รายการเพื่อแสดงผล
+    listProduct(token, 20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
   }, []);
-
+  // input
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
-
+  // form
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await AddProduct(token, form);
-      // แสดงข้อความแจ้งเตือนเป็นภาษาอังกฤษ
       toast.success(res.data?.message || "Product added successfully");
-      listProduct(token, 20); // โหลดข้อมูลใหม่หลังจากเพิ่มเสร็จ
-
+      listProduct(token, 20); // โหลดข้อมูลใหม่-หลังจากเพิ่มเสร็จ
       // Reset Form (Optional)
       setForm({
         title: "",
@@ -58,28 +59,13 @@ const ProductManagement = () => {
     }
   };
 
-  // Utility: จัดรูปแบบเงิน (ยังคงเป็น THB ตามบริบทของร้านค้า)
-  const formatCurrency = (num) => {
-    return new Intl.NumberFormat("th-TH", {
-      style: "currency",
-      currency: "THB",
-    }).format(num);
-  };
-
-  // Utility: สีของ Badge ตามจำนวนสินค้า
-  const getStockStatus = (qty) => {
-    if (qty > 10) return "bg-green-100 text-green-800";
-    if (qty > 0) return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto p-6 font-sans space-y-8">
       {/* --- Header Section --- */}
       <header className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <Package className="w-8 h-8 text-indigo-600" />
+            <Package className="w-8 h-8 text-indigo-400" />
             Product Management
           </h1>
           <p className="text-slate-500 text-sm mt-1">
@@ -180,18 +166,8 @@ const ProductManagement = () => {
               />
             </div>
 
-            {/* Image Upload Placeholder (Future feature) */}
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                Product Images
-              </label>
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50 transition cursor-pointer">
-                <ImageIcon className="w-8 h-8 mb-2" />
-                <span className="text-sm">
-                  Click to upload image (Not active)
-                </span>
-              </div>
-            </div>
+            {/* Image */}
+            <Uploadfile form={form} setForm={setForm} />
           </div>
 
           <div className="mt-6 flex justify-end">
@@ -207,7 +183,9 @@ const ProductManagement = () => {
       </div>
 
       {/* --- Table Section (Data Table) --- */}
+      {/* Card Layout */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Head */}
         <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
           <h3 className="font-semibold text-slate-700">Recent Products</h3>
           <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
@@ -218,7 +196,9 @@ const ProductManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
+              {/* tr - row*/}
               <tr className="bg-slate-50 text-slate-600 text-sm uppercase tracking-wider">
+                {/* th - head */}
                 <th className="px-6 py-4 font-medium border-b border-slate-100">
                   Image
                 </th>
@@ -247,9 +227,18 @@ const ProductManagement = () => {
                     className="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
                   >
                     <td className="px-6 py-4">
-                      <div className="w-10 h-10 bg-slate-200 rounded-md flex items-center justify-center text-slate-400">
+                      <div className="w-25 h-25 bg-slate-200 rounded-md flex items-center justify-center text-slate-400 overflow-hidden">
                         {/* Placeholder for image */}
-                        <ImageIcon size={20} />
+                        {/* เจาะจงรูปแรก [0] */}
+                        {item.images && item.images.length > 0 ? (
+                          <img
+                            src={item.images[0].secure_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon size={32} /> // ถ้าไม่มีรูป ค่อยโชว์ไอคอนแทน
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-900">
