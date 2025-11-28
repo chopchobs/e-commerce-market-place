@@ -24,7 +24,7 @@ router.post("/product-by", authCheck, adminCheck, ListProductByFilters);
 router.post("/search/filter", authCheck, adminCheck, SearchFilter);
 // Image - Add,delete
 router.post("/image", authCheck, adminCheck, UploadImages);
-router.delete("/removeImage", authCheck, adminCheck, RemoveImage);
+router.post("/removeImage", authCheck, adminCheck, RemoveImage);
 
 // step 2 : create routes
 module.exports = router;

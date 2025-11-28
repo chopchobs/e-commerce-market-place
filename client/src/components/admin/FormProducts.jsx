@@ -1,12 +1,24 @@
-import { useEffect, useState } from "react";
-import { AddProduct } from "../../api/createProducts";
+import React, { useEffect, useState } from "react";
 import useEcomStore from "../../store/ecom-store";
 import { toast } from "sonner";
-import { Package, Trash2, Edit, Plus, Image as ImageIcon } from "lucide-react"; // แนะนำให้ลง lucide-react สำหรับไอคอน
-// utility
-import { formatCurrency } from "../utility/formatCurrency"; // สกุลเงิน
+import {
+  Package,
+  Trash2,
+  Edit,
+  Plus,
+  Image as ImageIcon,
+  X,
+} from "lucide-react"; // เพิ่ม X icon
+import Resizer from "react-image-file-resizer";
+
+// API Import
+import {
+  AddProduct,
+  RemoveImage,
+  UploadImages,
+} from "../../api/createProducts"; // ตรวจสอบ path ให้ถูก
+import { formatCurrency } from "../utility/formatCurrency";
 import { getStockStatus } from "../utility/getStockStatus";
-import Uploadfile from "./Uploadfile";
 
 const ProductManagement = () => {
   // Global State (Zustand)🌎
@@ -15,7 +27,7 @@ const ProductManagement = () => {
   const fetchCategories = useEcomStore((state) => state.fetchCategories);
   const listProduct = useEcomStore((state) => state.listProduct);
   const products = useEcomStore((state) => state.products);
-
+  const [isLoading, SetIsLoading] = useState(false);
   // Local State 🎯
   const [form, setForm] = useState({
     title: "",
@@ -30,14 +42,14 @@ const ProductManagement = () => {
     fetchCategories(token);
     listProduct(token, 20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
   }, []);
-  // input
+  // Input - Product
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
-  // form
+  // form - Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -58,7 +70,73 @@ const ProductManagement = () => {
       toast.error("Failed to add product");
     }
   };
+  //  Upload - Image
+  const handleChangeImages = (e) => {
+    const files = e.target.files;
+    if (files) {
+      SetIsLoading(true);
+      let allFiles = form.images; // [] empty array
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        // Validate Type
+        if (!file.type.startsWith("image/")) {
+          toast.warning(`Picture ${form.name} not input!  `);
+          continue;
+        }
+        // Resize & Upload
+        Resizer.imageFileResizer(
+          file,
+          720,
+          720,
+          "JPEG",
+          100,
+          0,
+          (data) => {
+            // Endpoint Back-End
+            UploadImages(token, data)
+              .then((res) => {
+                allFiles.push(res.data.uploadResult);
+                console.log(res.data);
+                setForm({
+                  ...form,
+                  images: allFiles,
+                });
+                toast.success("Upload Success!!");
+                SetIsLoading(false);
+              })
+              .catch((error) => {
+                console.log(error);
+                toast.error("Upload Failed!!");
+                SetIsLoading(false);
+              });
+          },
+          "base64"
+        );
+      }
+    }
+  };
 
+  // Remove - Image
+  const handleRemoveImage = (public_id) => {
+    // console.log(public_id);
+    const images = form.images;
+    RemoveImage(token, public_id)
+      .then((res) => {
+        // อัพเดตรูปภาพในฟอร์มโดยการกรองเอารูปที่ถูกลบออก
+        const updatedImages = images.filter((item) => {
+          return item.public_id !== public_id;
+        });
+        toast.success(res.data.message || "Image removed successfully");
+        setForm({
+          ...form,
+          images: updatedImages,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Failed to remove image");
+      });
+  };
   return (
     <div className="w-full max-w-6xl mx-auto p-6 font-sans space-y-8">
       {/* --- Header Section --- */}
@@ -167,7 +245,55 @@ const ProductManagement = () => {
             </div>
 
             {/* Image */}
-            <Uploadfile form={form} setForm={setForm} />
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Product Images
+              </label>
+              <label className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50 transition cursor-pointer">
+                {/* เช็คสถานะ Loading (ถ้ามี state isLoading) */}
+                {isLoading ? (
+                  <div className="animate-pulse">Uploading...</div>
+                ) : (
+                  <ImageIcon className="w-8 h-8 mb-2" />
+                )}
+                <input
+                  type="file"
+                  name="images"
+                  multiple
+                  onChange={handleChangeImages}
+                  className="hidden"
+                ></input>
+                <span className="text-sm">Click to upload image</span>
+              </label>
+              {/* 2. ส่วนแสดงรูปตัวอย่าง (Preview Area) ⭐ เพิ่มใหม่ตรงนี้ */}
+              {form.images && form.images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  {form.images.map((item, index) => (
+                    <div
+                      key={index}
+                      className="relative group w-full h-32 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm"
+                    >
+                      {/* รูปภาพ */}
+                      <img
+                        src={item.secure_url}
+                        alt="preview"
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+
+                      {/* X - Delete */}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(item.public_id)}
+                        // เรียกฟังก์ชันลบรูปออกจากฟอร์ม
+                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="mt-6 flex justify-end">
@@ -227,17 +353,18 @@ const ProductManagement = () => {
                     className="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
                   >
                     <td className="px-6 py-4">
-                      <div className="w-25 h-25 bg-slate-200 rounded-md flex items-center justify-center text-slate-400 overflow-hidden">
+                      <div className=" relative group w-25 h-25 bg-slate-200 rounded-md flex items-center justify-center text-slate-400 overflow-hidden">
                         {/* Placeholder for image */}
-                        {/* เจาะจงรูปแรก [0] */}
+                        {/* รูปแรก [0] */}
                         {item.images && item.images.length > 0 ? (
                           <img
                             src={item.images[0].secure_url}
                             alt={item.title}
+                            value={form.images}
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <ImageIcon size={32} /> // ถ้าไม่มีรูป ค่อยโชว์ไอคอนแทน
+                          <ImageIcon size={32} />
                         )}
                       </div>
                     </td>
@@ -261,13 +388,20 @@ const ProductManagement = () => {
                           : "Out of Stock"}
                       </span>
                     </td>
+                    {/* Action Products */}
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        <button className="p-1.5 hover:bg-yellow-50 text-yellow-600 rounded-md transition-colors">
-                          <Edit size={16} />
+                        {/* Adjust */}
+                        <button className="p-1.5 hover:bg-yellow-100 text-yellow-600 rounded-md transition-colors">
+                          <Edit size={24} />
                         </button>
-                        <button className="p-1.5 hover:bg-red-50 text-red-600 rounded-md transition-colors">
-                          <Trash2 size={16} />
+                        {/* Delete */}
+                        <button
+                          type="button"
+                          className="p-1.5 hover:bg-red-100 text-red-600 rounded-md 
+                          transition-colors"
+                        >
+                          <Trash2 size={24} />
                         </button>
                       </div>
                     </td>
