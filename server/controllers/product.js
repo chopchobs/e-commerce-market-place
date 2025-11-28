@@ -295,9 +295,16 @@ exports.UploadImages = async (req, res, next) => {
 exports.RemoveImage = async (req, res, next) => {
   try {
     // json
-
-    res.status(200).send({
-      message: "Remove Image successfully !! ",
+    const { public_id } = req.body;
+    cloudinary.uploader.destroy(public_id, (error, result) => {
+      if (error) {
+        console.log("Error deleting image:", error);
+        return res.status(500).json({ message: "Failed to delete image" });
+      }
+      res.status(200).json({
+        result,
+        message: "Image Deleted Successfully !! ",
+      });
     });
   } catch (error) {
     next(error);

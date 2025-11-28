@@ -64,10 +64,14 @@ export const UploadImages = async (token, data) => {
   );
 };
 // Image - Delete
-export const RemoveImage = async (token, data) => {
-  return await axios.delete("http://localhost:5001/api/removeImage", data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const RemoveImage = async (token, public_id) => {
+  return await axios.post(
+    "http://localhost:5001/api/removeImage",
+    { public_id },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 };
