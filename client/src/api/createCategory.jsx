@@ -1,5 +1,6 @@
 import axios from "axios";
-
+// API Calls for Categories - CRUD Operations📦
+// Category - Create
 export const addCategory = async (token, name) => {
   // JS
 
@@ -9,7 +10,7 @@ export const addCategory = async (token, name) => {
     },
   });
 };
-
+// Category - List
 export const ListCategory = async (token) => {
   return await axios.get("http://localhost:5001/api/categories", {
     headers: {
@@ -17,7 +18,7 @@ export const ListCategory = async (token) => {
     },
   });
 };
-
+// Category - Remove
 export const RemoveCategory = async (token, id) => {
   return await axios.delete("http://localhost:5001/api/category/" + id, {
     headers: {

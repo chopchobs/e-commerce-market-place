@@ -1,5 +1,5 @@
 import axios from "axios";
-
+// API Calls for Authentication - Current User/Admin 🔑
 // User - token 🔑
 export const CurrentUser = async (token) =>
   await axios.post(
@@ -11,7 +11,6 @@ export const CurrentUser = async (token) =>
       },
     }
   );
-
 // Admin - token 🔑
 export const CurrentAdmin = async (token) => {
   return await axios.post(

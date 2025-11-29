@@ -16,8 +16,8 @@ import HomeUser from "../pages/user/HomeUser";
 import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
 import Manage from "../pages/admin/Manage";
-import FormCategory from "../components/admin/FormCategory";
-import FormProducts from "../components/admin/FormProducts";
+import EditProduct from "../pages/admin/EditProduct";
+import Category from "../pages/admin/Category";
 
 const router = createBrowserRouter([
   {
@@ -41,8 +41,9 @@ const router = createBrowserRouter([
     element: <ProtectRouteAdmin element={<LayoutAdmin />} />,
     children: [
       { index: true, element: <Dashboard /> },
-      { path: "category", element: <FormCategory /> },
-      { path: "product", element: <FormProducts /> },
+      { path: "category", element: <Category /> },
+      { path: "product", element: <Product /> },
+      { path: "product/:id", element: <EditProduct /> },
       { path: "manage", element: <Manage /> },
     ],
   },

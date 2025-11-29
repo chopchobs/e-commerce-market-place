@@ -10,15 +10,20 @@ import {
 } from "lucide-react";
 import SideBarButton from "../sidebar/SideBarButton";
 import SideBarLink from "../sidebar/SildeBarLink";
+import useEcomStore from "../../store/ecom-store";
 
 // Main Sidebar Component
 const AdminSidebar = () => {
+  const logout = useEcomStore((state) => state.logout);
   const navigate = useNavigate();
   const handleLogout = () => {
-    // ใส่ Logic Logout ตรงนี้
-    // เช่น clear token, firebase signOut
+    try {
+      logout();
+      console.log("Logging out...");
+      navigate("/login");
+    } catch (error) {}
     console.log("Logging out...");
-    navigate("/login"); // ตัวอย่างการ Redirect
+    navigate("/login");
   };
 
   return (
@@ -88,11 +93,18 @@ const AdminSidebar = () => {
           </div>
         </div>
 
-        {/* ใช้ SidebarButton สำหรับ Logout */}
-        <SideBarButton icon={LogOut} label="Sign Out" onClick={handleLogout} />
+        {/*  Logout */}
+        <div
+          onClick={handleLogout}
+          className="w-full cursor-pointer text-red-400 hover:text-red-400 transition-colors"
+        >
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/50 transition-all">
+            <LogOut size={25} />
+            <span className="font-medium">Sign Out</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
 export default AdminSidebar;

@@ -19,8 +19,9 @@ import {
 } from "../../api/createProducts"; // ตรวจสอบ path ให้ถูก
 import { formatCurrency } from "../utility/formatCurrency";
 import { getStockStatus } from "../utility/getStockStatus";
+import { Link } from "react-router-dom";
 
-const ProductManagement = () => {
+const FormProducts = () => {
   // Global State (Zustand)🌎
   const token = useEcomStore((state) => state.token);
   const categories = useEcomStore((state) => state.categories);
@@ -40,7 +41,7 @@ const ProductManagement = () => {
   useEffect(() => {
     // เรียกข้อมูลเมื่อ Component ถูกโหลด
     fetchCategories(token);
-    listProduct(token, 20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
+    listProduct(token, 100); // เรียกจำนวน 100 รายการเพื่อแสดงผล
   }, []);
   // Input - Product
   const handleChange = (e) => {
@@ -80,7 +81,7 @@ const ProductManagement = () => {
         const file = files[i];
         // Validate Type
         if (!file.type.startsWith("image/")) {
-          toast.warning(`Picture ${form.name} not input!  `);
+          toast.warning(`File ${file.name} is not an image!`);
           continue;
         }
         // Resize & Upload
@@ -91,8 +92,9 @@ const ProductManagement = () => {
           "JPEG",
           100,
           0,
+          // data after resizing
           (data) => {
-            // Endpoint Back-End
+            // Endpoint Upload API
             UploadImages(token, data)
               .then((res) => {
                 allFiles.push(res.data.uploadResult);
@@ -110,7 +112,7 @@ const ProductManagement = () => {
                 SetIsLoading(false);
               });
           },
-          "base64"
+          "base64" // output type
         );
       }
     }
@@ -118,11 +120,11 @@ const ProductManagement = () => {
 
   // Remove - Image
   const handleRemoveImage = (public_id) => {
-    // console.log(public_id);
     const images = form.images;
+    // Call API to remove from server
     RemoveImage(token, public_id)
       .then((res) => {
-        // อัพเดตรูปภาพในฟอร์มโดยการกรองเอารูปที่ถูกลบออก
+        // Filter out the removed image from the form's images array
         const updatedImages = images.filter((item) => {
           return item.public_id !== public_id;
         });
@@ -265,26 +267,27 @@ const ProductManagement = () => {
                 ></input>
                 <span className="text-sm">Click to upload image</span>
               </label>
-              {/* 2. ส่วนแสดงรูปตัวอย่าง (Preview Area) ⭐ เพิ่มใหม่ตรงนี้ */}
+              {/*  Preview Area ⭐  */}
               {form.images && form.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  {/* Loop through images */}
                   {form.images.map((item, index) => (
                     <div
                       key={index}
                       className="relative group w-full h-32 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm"
                     >
-                      {/* รูปภาพ */}
+                      {/* Picture */}
                       <img
                         src={item.secure_url}
                         alt="preview"
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
 
-                      {/* X - Delete */}
+                      {/* X Delete */}
                       <button
                         type="button"
+                        // Call function with public_id for remove
                         onClick={() => handleRemoveImage(item.public_id)}
-                        // เรียกฟังก์ชันลบรูปออกจากฟอร์ม
                         className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200"
                       >
                         <X size={16} />
@@ -392,17 +395,21 @@ const ProductManagement = () => {
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
                         {/* Adjust */}
-                        <button className="p-1.5 hover:bg-yellow-100 text-yellow-600 rounded-md transition-colors">
+                        <Link
+                          to={"/admin/product/" + item.id}
+                          className="p-1.5 hover:bg-yellow-100 text-yellow-600 rounded-md transition-colors"
+                        >
                           <Edit size={24} />
-                        </button>
+                        </Link>
                         {/* Delete */}
-                        <button
+                        <div
+                          to={"/admin/product/" + item.id}
                           type="button"
                           className="p-1.5 hover:bg-red-100 text-red-600 rounded-md 
                           transition-colors"
                         >
                           <Trash2 size={24} />
-                        </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -425,4 +432,4 @@ const ProductManagement = () => {
   );
 };
 
-export default ProductManagement;
+export default FormProducts;
