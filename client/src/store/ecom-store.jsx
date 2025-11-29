@@ -9,6 +9,7 @@ const ecomStore = (set) => ({
   token: null,
   categories: [],
   products: [],
+  readProduct: null,
   // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
     const res = await axios.post("http://localhost:5001/api/login", Data);
@@ -42,12 +43,41 @@ const ecomStore = (set) => ({
       console.log(error);
     }
   },
+  // Fetch Product Data
+  fetchProduct: async (token, id) => {
+    try {
+      const res = await ReadProduct(token, id);
+      // setForm with fetched data (old data)
+      set({
+        readProduct: res.data.ReadProducts,
+      });
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error fetching product data");
+    }
+  },
+
+  // Logout - clear store
+  logout: () => {
+    set({
+      user: null,
+      token: null,
+      categories: [],
+      products: [],
+      readProduct: null,
+    });
+    // Clear persisted store from localStorage
+    localStorage.removeItem("ecom-store");
+  },
 });
 
-const userPersist = {
-  // Key's name for LocalStorage
-  name: "E-commerce Store",
-};
-const useEcomStore = create(persist(ecomStore, userPersist));
+// persist store to localStorage
+const useEcomStore = create(
+  persist(ecomStore, {
+    name: "ecom-store",
+    storage: createJSONStorage(() => localStorage),
+    // (Optional) specify localStorage
+  })
+);
 
 export default useEcomStore;

@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FolderPlus, Trash2, Plus, GripVertical } from "lucide-react";
-import {
-  addCategory,
-  ListCategory,
-  RemoveCategory,
-} from "../../api/createCategory";
+import { addCategory, RemoveCategory } from "../../api/createCategory";
 import useEcomStore from "../../store/ecom-store";
 
 const FormCategory = () => {

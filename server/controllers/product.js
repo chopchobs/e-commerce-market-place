@@ -32,7 +32,7 @@ exports.AddProduct = async (req, res, next) => {
     res.status(500).json({ message: "Failed to Create Product" });
   }
 };
-// LIST:Count  - GET
+// List - GET, count
 exports.ListProduct = async (req, res, next) => {
   try {
     // FindMany
@@ -79,7 +79,7 @@ exports.ReadProduct = async (req, res, next) => {
   }
 };
 // Update - PUT,iD
-exports.UpdateProduct = async (req, res, next) => {
+exports.UpdateProducts = async (req, res, next) => {
   try {
     //code
     const { id } = req.params;
@@ -121,7 +121,7 @@ exports.UpdateProduct = async (req, res, next) => {
     });
   }
 };
-// Delete product - DELETE,iD
+// Delete - DELETE,iD
 exports.RemoveProduct = async (req, res, next) => {
   try {
     // code
@@ -140,7 +140,7 @@ exports.RemoveProduct = async (req, res, next) => {
     res.status(500).json({ message: "Failed to delete Product" });
   }
 };
-// List Product by Filters - POST
+// List - POST, Filters
 exports.ListProductByFilters = async (req, res, next) => {
   try {
     // code
@@ -161,8 +161,8 @@ exports.ListProductByFilters = async (req, res, next) => {
     });
   }
 };
-// ------- Handle -------
-// handle Query ( ประเภท )
+// ------- Handle , SearchFilter -------
+// Query ( ค้นหาด้วยคำ )
 const hldQuery = async (req, res, query) => {
   try {
     //code
@@ -185,7 +185,7 @@ const hldQuery = async (req, res, query) => {
     next(error);
   }
 };
-// handle Price [ น้อย,มาก ]
+// Price [ ราคา ]
 const hldPrice = async (req, res, priceRange) => {
   try {
     const hldPrice = await prisma.product.findMany({
@@ -208,7 +208,7 @@ const hldPrice = async (req, res, priceRange) => {
     res.status(400).send(error);
   }
 };
-// handle Category ( id )
+// Category [ หมวดหมู่ ]
 const hldCategory = async (req, res, categoryId) => {
   try {
     // code
@@ -257,6 +257,7 @@ exports.SearchFilter = async (req, res, query) => {
   }
 };
 
+// Upload an image
 // Configuration - Cloudinary(.env)
 // https://console.cloudinary.com/app/c-e15fd94742aea736f2d9b07ac3aefd/image/getting-started
 cloudinary.config({
@@ -264,13 +265,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_AIP_KEY,
   api_secret: process.env.CLOUDINARY_AIP_SECRET,
 });
-
-// Upload an image
-// const uploadResult = await cloudinary.uploader.upload().catch((error) => {
-//   console.log(error);
-// });
-// console.log(uploadResult);
-
 // Image - Add
 exports.UploadImages = async (req, res, next) => {
   try {
