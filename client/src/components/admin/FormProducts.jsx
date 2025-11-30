@@ -10,11 +10,13 @@ import {
   X,
 } from "lucide-react"; // เพิ่ม X icon
 import Resizer from "react-image-file-resizer";
+import Swal from "sweetalert2";
 
 // API Import
 import {
   AddProduct,
   RemoveImage,
+  RemoveProducts,
   UploadImages,
 } from "../../api/createProducts"; // ตรวจสอบ path ให้ถูก
 import { formatCurrency } from "../utility/formatCurrency";
@@ -29,7 +31,7 @@ const FormProducts = () => {
   const listProduct = useEcomStore((state) => state.listProduct);
   const products = useEcomStore((state) => state.products);
   const [isLoading, SetIsLoading] = useState(false);
-  // Local State 🎯
+  // Local State (Form) 📦
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -41,22 +43,18 @@ const FormProducts = () => {
   useEffect(() => {
     // เรียกข้อมูลเมื่อ Component ถูกโหลด
     fetchCategories(token);
-    listProduct(token, 100); // เรียกจำนวน 100 รายการเพื่อแสดงผล
+    listProduct(token, 20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
   }, []);
-  // Input - Product
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-  // form - Submit
+  // Handle - Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await AddProduct(token, form);
-      toast.success(res.data?.message || "Product added successfully");
-      listProduct(token, 20); // โหลดข้อมูลใหม่-หลังจากเพิ่มเสร็จ
+      Swal.fire({
+        title: res.data?.message || "Product added successfully",
+        icon: "success",
+      });
+      await listProduct(token, 20); // โหลดข้อมูลใหม่-หลังจากเพิ่มเสร็จ
       // Reset Form (Optional)
       setForm({
         title: "",
@@ -71,7 +69,43 @@ const FormProducts = () => {
       toast.error("Failed to add product");
     }
   };
-  //  Upload - Image
+  // Handle - Change Form Input
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+  // Handle - Delete Product
+  const handleDeleteProduct = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await RemoveProducts(token, id);
+          Swal.fire({
+            title: "Product deleted successfully",
+            icon: "success",
+          });
+          await listProduct(token, 20); // Reload products after deletion
+        } catch (error) {
+          console.error(error);
+          Swal.fire({
+            title: "Failed to delete product",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+  // Handle - Upload Image
   const handleChangeImages = (e) => {
     const files = e.target.files;
     if (files) {
@@ -81,7 +115,10 @@ const FormProducts = () => {
         const file = files[i];
         // Validate Type
         if (!file.type.startsWith("image/")) {
-          toast.warning(`File ${file.name} is not an image!`);
+          Swal.fire({
+            title: `File ${file.name} is not an image!`,
+            icon: "warning",
+          });
           continue;
         }
         // Resize & Upload
@@ -93,9 +130,9 @@ const FormProducts = () => {
           100,
           0,
           // data after resizing
-          (data) => {
+          async (data) => {
             // Endpoint Upload API
-            UploadImages(token, data)
+            await UploadImages(token, data)
               .then((res) => {
                 allFiles.push(res.data.uploadResult);
                 console.log(res.data);
@@ -103,12 +140,18 @@ const FormProducts = () => {
                   ...form,
                   images: allFiles,
                 });
-                toast.success("Upload Success!!");
+                Swal.fire({
+                  title: "Upload Success!!",
+                  icon: "success",
+                });
                 SetIsLoading(false);
               })
               .catch((error) => {
                 console.log(error);
-                toast.error("Upload Failed!!");
+                Swal.fire({
+                  title: "Upload Failed!!",
+                  icon: "error",
+                });
                 SetIsLoading(false);
               });
           },
@@ -117,18 +160,20 @@ const FormProducts = () => {
       }
     }
   };
-
-  // Remove - Image
-  const handleRemoveImage = (public_id) => {
+  // Handle - Remove Image
+  const handleRemoveImage = async (public_id) => {
     const images = form.images;
     // Call API to remove from server
-    RemoveImage(token, public_id)
-      .then((res) => {
+    await RemoveImage(token, public_id)
+      .then(async (res) => {
         // Filter out the removed image from the form's images array
-        const updatedImages = images.filter((item) => {
+        const updatedImages = await images.filter((item) => {
           return item.public_id !== public_id;
         });
-        toast.success(res.data.message || "Image removed successfully");
+        Swal.fire({
+          title: res.data.message || "Image removed successfully",
+          icon: "success",
+        });
         setForm({
           ...form,
           images: updatedImages,
@@ -136,7 +181,10 @@ const FormProducts = () => {
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Failed to remove image");
+        Swal.fire({
+          title: "Failed to remove image",
+          icon: "error",
+        });
       });
   };
   return (
@@ -394,19 +442,18 @@ const FormProducts = () => {
                     {/* Action Products */}
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        {/* Adjust */}
+                        {/* Edit  */}
                         <Link
                           to={"/admin/product/" + item.id}
                           className="p-1.5 hover:bg-yellow-100 text-yellow-600 rounded-md transition-colors"
                         >
                           <Edit size={24} />
                         </Link>
-                        {/* Delete */}
+                        {/* Delete  */}
                         <div
-                          to={"/admin/product/" + item.id}
+                          onClick={() => handleDeleteProduct(item.id)}
                           type="button"
-                          className="p-1.5 hover:bg-red-100 text-red-600 rounded-md 
-                          transition-colors"
+                          className="p-1.5 hover:bg-red-100 text-red-600 rounded-md transition-colors"
                         >
                           <Trash2 size={24} />
                         </div>

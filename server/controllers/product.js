@@ -1,5 +1,7 @@
 const prisma = require("../config/prisma");
 const cloudinary = require("cloudinary").v2; // cloudinary
+// CRUD Operations - Product
+
 // Create - POST
 exports.AddProduct = async (req, res, next) => {
   try {
@@ -32,7 +34,7 @@ exports.AddProduct = async (req, res, next) => {
     res.status(500).json({ message: "Failed to Create Product" });
   }
 };
-// List - GET, count
+// List - GET, Count
 exports.ListProduct = async (req, res, next) => {
   try {
     // FindMany
@@ -81,19 +83,22 @@ exports.ReadProduct = async (req, res, next) => {
 // Update - PUT,iD
 exports.UpdateProducts = async (req, res, next) => {
   try {
-    //code
+    // Push code
     const { id } = req.params;
     const { title, description, price, quantity, categoryId, images } =
       req.body;
+    // 1. Delete existing images from database
     await prisma.image.deleteMany({
       where: {
-        productId: Number(id), // OrCart,Order
+        productId: Number(id),
       },
     });
+    // 2. Update product details and add new images
     const UpdateProducts = await prisma.product.update({
       where: {
         id: Number(id),
       },
+      // New Data to Update
       data: {
         title: title,
         description: description,
@@ -126,25 +131,50 @@ exports.RemoveProduct = async (req, res, next) => {
   try {
     // code
     const { id } = req.params;
-    const DeleteProduct = await prisma.product.delete({
-      where: {
-        id: Number(id),
-      },
+    // 1. Include images - delete from cloudinary
+    const product = await prisma.product.findUnique({
+      where: { id: Number(id) },
+      include: { images: true },
+    });
+    console.log(product);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    // 2. Map through images and create deletion promises
+    const DeleteImages = product.images.map((item) => {
+      return new Promise((resolve, reject) => {
+        // delete from cloudinary
+        cloudinary.uploader.destroy(item.public_id, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+      });
+    });
+    // แบบสั้น (ทำงานเหมือนกัน)
+    // const DeleteImages = product.images.map((item) => {
+    //   return cloudinary.uploader.destroy(item.public_id);
+    // });
+
+    // 3. Wait for all deletions to complete
+    await Promise.all(DeleteImages);
+    // 4. Delete from database
+    await prisma.product.delete({
+      where: { id: Number(id) },
     });
     res.status(200).send({
-      DeleteProduct,
       message: "Product Deleted Successfully",
     });
   } catch (error) {
-    next(error);
-    res.status(500).json({ message: "Failed to delete Product" });
+    res.status(500).json({ message: "Server Error: Failed to delete Product" });
   }
 };
-// List - POST, Filters
+
+// ------- ListProduct By Filters -------
 exports.ListProductByFilters = async (req, res, next) => {
   try {
     // code
     const { sort, order, limit } = req.body;
+    //
     const ListFilters = await prisma.product.findMany({
       take: limit,
       orderBy: { [sort]: order },
@@ -161,8 +191,8 @@ exports.ListProductByFilters = async (req, res, next) => {
     });
   }
 };
-// ------- Handle , SearchFilter -------
-// Query ( ค้นหาด้วยคำ )
+// ------- Search Filter -------
+// 1.Query ( ค้นหาด้วยคำ )
 const hldQuery = async (req, res, query) => {
   try {
     //code
@@ -185,7 +215,7 @@ const hldQuery = async (req, res, query) => {
     next(error);
   }
 };
-// Price [ ราคา ]
+// 2.Price [ ราคา ]
 const hldPrice = async (req, res, priceRange) => {
   try {
     const hldPrice = await prisma.product.findMany({
@@ -208,7 +238,7 @@ const hldPrice = async (req, res, priceRange) => {
     res.status(400).send(error);
   }
 };
-// Category [ หมวดหมู่ ]
+// 3.Category [ หมวดหมู่ ]
 const hldCategory = async (req, res, categoryId) => {
   try {
     // code
@@ -231,7 +261,7 @@ const hldCategory = async (req, res, categoryId) => {
     res.status(400).send(error);
   }
 };
-// --------------
+// Main Search Filter
 exports.SearchFilter = async (req, res, query) => {
   try {
     // code
@@ -257,15 +287,14 @@ exports.SearchFilter = async (req, res, query) => {
   }
 };
 
-// Upload an image
-// Configuration - Cloudinary(.env)
-// https://console.cloudinary.com/app/c-e15fd94742aea736f2d9b07ac3aefd/image/getting-started
+// ------- Image Upload & Remove -------
+// Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_AIP_KEY,
   api_secret: process.env.CLOUDINARY_AIP_SECRET,
 });
-// Image - Add
+// Image - Upload
 exports.UploadImages = async (req, res, next) => {
   try {
     // json
@@ -285,7 +314,7 @@ exports.UploadImages = async (req, res, next) => {
     });
   }
 };
-// Image - Delete
+// Image - Remove
 exports.RemoveImage = async (req, res, next) => {
   try {
     // json

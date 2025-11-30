@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const LoadingPage = ({
-  countStart = 3,
+  countStart = 2, // เริ่มนับถอยหลังจากเลขนี้
   redirectPath = "/",
   enableRedirect = true, //  (เปิด/ปิด) นับถอยหลัง
 }) => {
@@ -12,7 +12,6 @@ const LoadingPage = ({
   useEffect(() => {
     // ถ้าไม่เปิดระบบ redirect ก็ไม่ต้องทำอะไร (return ออกเลย)
     if (!enableRedirect) return;
-
     const intervalId = setInterval(() => {
       setCount((currentCount) => {
         if (currentCount <= 1) {
@@ -23,7 +22,6 @@ const LoadingPage = ({
         return currentCount - 1;
       });
     }, 1000);
-
     return () => clearInterval(intervalId);
   }, [enableRedirect]); // ใส่ dependency เพื่อความชัวร์
 
