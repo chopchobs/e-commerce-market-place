@@ -9,6 +9,7 @@ npm i react-router-dom
 npm install sonner
 npm install zustand
 npm install lucide-react
+npm install sweetalert2
 
 npm install @radix-ui/themes
 npm install @react-oauth/google@latest

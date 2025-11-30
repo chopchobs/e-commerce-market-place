@@ -21,6 +21,7 @@ import {
   UpdateProducts,
   UploadImages,
 } from "../../api/createProducts";
+import Swal from "sweetalert2";
 
 const FormEditProduct = () => {
   // --- Global State & Router ---
@@ -68,7 +69,10 @@ const FormEditProduct = () => {
       });
     } catch (error) {
       console.error("Error fetching product:", error);
-      toast.error("Error fetching product data");
+      Swal.fire({
+        title: "Error fetching product data",
+        icon: "error",
+      });
     }
   };
   // Handle Form Submit - Update API
@@ -77,11 +81,17 @@ const FormEditProduct = () => {
     setIsSubmitting(true);
     try {
       const res = await UpdateProducts(token, id, form);
-      toast.success(res.data?.message || "Update Product Success!");
+      Swal.fire({
+        title: res.data?.message || "Update Product Success!",
+        icon: "success",
+      });
       navigate("/admin/product"); // fly back to product list
     } catch (error) {
       console.error(error);
-      toast.error("Update Failed");
+      Swal.fire({
+        title: "Update Failed",
+        icon: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +104,10 @@ const FormEditProduct = () => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (!file.type.startsWith("image/")) {
-          toast.warning(`File ${file.name} is not an image!`);
+          Swal.fire({
+            title: `File ${file.name} is not an image!`,
+            icon: "warning",
+          });
           continue;
         }
         Resizer.imageFileResizer(
@@ -111,11 +124,17 @@ const FormEditProduct = () => {
                   ...prevForm,
                   images: [...prevForm.images, res.data.uploadResult],
                 }));
-                toast.success("Image Uploaded");
+                Swal.fire({
+                  title: "Image Uploaded",
+                  icon: "success",
+                });
               })
               .catch((error) => {
                 console.log(error);
-                toast.error("Upload Failed");
+                Swal.fire({
+                  title: "Upload Failed",
+                  icon: "error",
+                });
               })
               .finally(() => setIsLoading(false));
           },
@@ -137,11 +156,17 @@ const FormEditProduct = () => {
     // ยิง API ลบทีหลัง
     RemoveImage(token, public_id)
       .then((res) => {
-        toast.success(res.data.message || "Image removed successfully");
+        Swal.fire({
+          title: res.data.message || "Image removed successfully",
+          icon: "success",
+        });
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Failed to remove image");
+        Swal.fire({
+          title: "Failed to remove image",
+          icon: "error",
+        });
       });
   };
   // --- Render Layout ---
@@ -172,7 +197,7 @@ const FormEditProduct = () => {
             onClick={() => navigate("/admin/product")}
             className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            cel
+            Cancel
           </button>
           <button
             type="submit"

@@ -62,6 +62,8 @@ const MainNav = () => {
               </Link>
               {/* Register: ปุ่มหลัก (Primary Button) สีดำมุมโค้ง */}
               <Link
+                checkout
+                main
                 to={"register"}
                 className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition-transform hover:scale-105 hover:bg-gray-800 shadow-lg shadow-gray-200"
               >

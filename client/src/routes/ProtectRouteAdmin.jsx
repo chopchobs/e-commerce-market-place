@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom"; // เพื่อใช้ดีดคนออก
 import { CurrentAdmin } from "../api/auth";
 import useEcomStore from "../store/ecom-store";
 import LoadingPage from "./Loading";
@@ -32,7 +31,7 @@ export const ProtectRouteAdmin = ({ element }) => {
 
   //
   if (loading) {
-    // false เพื่อไม่ให้มันนับถอยหลัง -LoadingPage
+    // false เพื่อไม่ให้มันนับถอยหลัง - LoadingPage
     return <LoadingPage enableRedirect={false} />;
   }
   // ถ้า "ผ่าน" -> ให้ไปต่อ
