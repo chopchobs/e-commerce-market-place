@@ -2,7 +2,7 @@ import axios from "axios";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ListCategory } from "../api/createCategory";
-import { CountProducts } from "../api/createProducts";
+import { CountProducts, ReadProduct } from "../api/createProducts";
 
 const ecomStore = (set) => ({
   user: null,
@@ -21,10 +21,10 @@ const ecomStore = (set) => ({
     });
     return res;
   },
-  // Categories
-  fetchCategories: async (token) => {
+  // Categories ( public )
+  fetchCategories: async () => {
     try {
-      const res = await ListCategory(token);
+      const res = await ListCategory();
       set({
         categories: res.data.ListName,
       });
@@ -32,10 +32,10 @@ const ecomStore = (set) => ({
       console.log(error);
     }
   },
-  // Products
-  listProduct: async (token, count) => {
+  // Products ( public )
+  listProduct: async (count) => {
     try {
-      const res = await CountProducts(token, count);
+      const res = await CountProducts(count);
       set({
         products: res.data.ListProducts,
       });
@@ -44,7 +44,7 @@ const ecomStore = (set) => ({
     }
   },
   // Fetch Product Data
-  fetchProduct: async (token, id) => {
+  fetchProduct: async (id) => {
     try {
       const res = await ReadProduct(token, id);
       // setForm with fetched data (old data)
@@ -53,7 +53,6 @@ const ecomStore = (set) => ({
       });
     } catch (error) {
       console.error("Error fetching product:", error);
-      toast.error("Error fetching product data");
     }
   },
 
@@ -70,7 +69,6 @@ const ecomStore = (set) => ({
     localStorage.removeItem("ecom-store");
   },
 });
-
 // persist store to localStorage
 const useEcomStore = create(
   persist(ecomStore, {

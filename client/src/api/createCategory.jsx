@@ -9,13 +9,9 @@ export const addCategory = async (token, name) => {
     },
   });
 };
-// Category - List
-export const ListCategory = async (token) => {
-  return await axios.get("http://localhost:5001/api/categories", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+// Category (Public) - List
+export const ListCategory = async () => {
+  return await axios.get("http://localhost:5001/api/categories");
 };
 // Category - Update
 export const updateCategory = async (token, id, name) => {

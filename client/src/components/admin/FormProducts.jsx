@@ -41,9 +41,8 @@ const FormProducts = () => {
     images: [],
   });
   useEffect(() => {
-    // เรียกข้อมูลเมื่อ Component ถูกโหลด
-    fetchCategories(token);
-    listProduct(token, 20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
+    fetchCategories(); // โหลดหมวดหมู่ตอนเริ่มต้น
+    listProduct(20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
   }, []);
   // Handle - Submit Form
   const handleSubmit = async (e) => {
@@ -54,7 +53,7 @@ const FormProducts = () => {
         title: res.data?.message || "Product added successfully",
         icon: "success",
       });
-      await listProduct(token, 20); // โหลดข้อมูลใหม่-หลังจากเพิ่มเสร็จ
+      await listProduct(20); // โหลดข้อมูลใหม่-หลังจากเพิ่มเสร็จ
       // Reset Form (Optional)
       setForm({
         title: "",
@@ -94,7 +93,7 @@ const FormProducts = () => {
             title: "Product deleted successfully",
             icon: "success",
           });
-          await listProduct(token, 20); // Reload products after deletion
+          await listProduct(20); // Reload products after deletion
         } catch (error) {
           console.error(error);
           Swal.fire({
