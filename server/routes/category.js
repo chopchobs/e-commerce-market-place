@@ -10,7 +10,7 @@ const {
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 // step 3 : define routes
 router.post("/category", authCheck, adminCheck, AddCategory);
-router.get("/categories", authCheck, adminCheck, List);
+router.get("/categories", List); // Public route
 router.put("/category/:id", authCheck, adminCheck, Update);
 router.delete("/category/:id", authCheck, adminCheck, Remove);
 

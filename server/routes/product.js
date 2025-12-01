@@ -16,7 +16,7 @@ const { authCheck, adminCheck } = require("../middleware/authCheck");
 
 // step 3 : create routes - CRUD
 router.post("/product", authCheck, adminCheck, AddProduct);
-router.get("/products/:count", authCheck, adminCheck, ListProduct);
+router.get("/products/:count", ListProduct); // Public Route
 router.get("/product/:id", authCheck, adminCheck, ReadProduct);
 router.put("/product/:id", authCheck, adminCheck, UpdateProducts);
 router.delete("/product/:id", authCheck, adminCheck, RemoveProduct);

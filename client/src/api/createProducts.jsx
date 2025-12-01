@@ -1,4 +1,5 @@
 import axios from "axios";
+
 // API Calls for Products - CRUD Operations 📦
 // Product - Create
 export const AddProduct = async (token, data) => {
@@ -8,13 +9,9 @@ export const AddProduct = async (token, data) => {
     },
   });
 };
-// Product - Read Count
-export const CountProducts = async (token, count = 20) => {
-  return await axios.get("http://localhost:5001/api/products/" + count, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+// Product (Public) - Read Count
+export const CountProducts = async (count = 20) => {
+  return await axios.get("http://localhost:5001/api/products/" + count);
 };
 // Product - Read ID
 export const ReadProduct = async (token, id) => {
