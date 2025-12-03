@@ -2,7 +2,11 @@ import axios from "axios";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ListCategory } from "../api/createCategory";
-import { CountProducts, ReadProduct } from "../api/createProducts";
+import {
+  CountProducts,
+  ReadProduct,
+  SearchProducts,
+} from "../api/createProducts";
 
 const ecomStore = (set) => ({
   user: null,
@@ -21,17 +25,19 @@ const ecomStore = (set) => ({
     });
     return res;
   },
+
   // Categories ( public )
   fetchCategories: async () => {
     try {
       const res = await ListCategory();
       set({
-        categories: res.data.ListName,
+        categories: res.data.ListCategoryName,
       });
     } catch (error) {
       console.log(error);
     }
   },
+
   // Products ( public )
   listProduct: async (count) => {
     try {
@@ -43,7 +49,8 @@ const ecomStore = (set) => ({
       console.log(error);
     }
   },
-  // Fetch Product Data
+
+  // Fetch Product Data by ID ( for Read , Update , Delete )
   fetchProduct: async (id) => {
     try {
       const res = await ReadProduct(token, id);
@@ -55,6 +62,19 @@ const ecomStore = (set) => ({
       console.error("Error fetching product:", error);
     }
   },
+
+  // SearchFilter ( public ) - Query, Category, Price
+  actionSearchProduct: async (arg) => {
+    try {
+      const res = await SearchProducts(arg);
+      set({
+        products: res.data.SearchFilter || [],
+      });
+    } catch (error) {
+      console.error("Error searching products:", error);
+    }
+  },
+  // Search Category  ( public ) - Query
 
   // Logout - clear store
   logout: () => {

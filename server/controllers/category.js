@@ -39,9 +39,9 @@ exports.AddCategory = async (req, res, next) => {
 exports.List = async (req, res, next) => {
   try {
     // code
-    const ListName = await prisma.category.findMany();
+    const ListCategoryName = await prisma.category.findMany();
     res.status(200).json({
-      ListName,
+      ListCategoryName,
       message: "List Name of Category successfully",
     });
   } catch (error) {

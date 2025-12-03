@@ -45,14 +45,11 @@ export const FilterProducts = async (token, data) => {
     },
   });
 };
-// Product - Search
-export const SearchProducts = async (token, data) => {
-  return await axios.post("http://localhost:5001/api/search/filter", data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+// Product - Search (Public)
+export const SearchProducts = async (arg) => {
+  return await axios.post("http://localhost:5001/api/search/filter", arg);
 };
+
 // IMAGE API - Operations(Upload, Delete)🖼️ ✅,⛔️
 // Image - 1.Upload
 export const UploadImages = async (token, data) => {

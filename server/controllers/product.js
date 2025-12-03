@@ -136,7 +136,6 @@ exports.RemoveProduct = async (req, res, next) => {
       where: { id: Number(id) },
       include: { images: true },
     });
-    console.log(product);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -162,6 +161,7 @@ exports.RemoveProduct = async (req, res, next) => {
       where: { id: Number(id) },
     });
     res.status(200).send({
+      DeleteImages,
       message: "Product Deleted Successfully",
     });
   } catch (error) {
@@ -193,7 +193,7 @@ exports.ListProductByFilters = async (req, res, next) => {
 };
 // ------- Search Filter -------
 // 1.Query ( ค้นหาด้วยคำ )
-const hldQuery = async (req, res, query) => {
+const handleQuery = async (req, res, query, next) => {
   try {
     //code
     const products = await prisma.product.findMany({
@@ -208,17 +208,41 @@ const hldQuery = async (req, res, query) => {
       },
     });
     res.status(200).send({
-      products,
-      message: "handleQuery",
+      SearchFilter: products,
+      message: "Search Query Success",
     });
   } catch (error) {
     next(error);
   }
 };
-// 2.Price [ ราคา ]
-const hldPrice = async (req, res, priceRange) => {
+// 2.Category [ หมวดหมู่ ]
+const handleCategory = async (req, res, categoryId, next) => {
   try {
-    const hldPrice = await prisma.product.findMany({
+    // code
+    const products = await prisma.product.findMany({
+      where: {
+        categoryId: {
+          in: categoryId.map((id) => Number(id)),
+        },
+      },
+      // show Card - Front
+      include: {
+        category: true,
+        images: true,
+      },
+    });
+    res.status(200).send({
+      SearchFilter: products,
+      message: "Search Category Success",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// 3.Price [ ราคา ]
+const handlePrice = async (req, res, priceRange, next) => {
+  try {
+    const products = await prisma.product.findMany({
       where: {
         price: {
           gte: priceRange[0],
@@ -231,54 +255,31 @@ const hldPrice = async (req, res, priceRange) => {
       },
     });
     res.status(200).send({
-      hldPrice,
-      message: "Price",
+      SearchFilter: products,
+      message: "Search Price Success",
     });
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
-// 3.Category [ หมวดหมู่ ]
-const hldCategory = async (req, res, categoryId) => {
-  try {
-    // code
-    const hldCategory = await prisma.product.findMany({
-      where: {
-        categoryId: {
-          in: categoryId.map((id) => Number(id)),
-        },
-      },
-      include: {
-        category: true,
-        images: true,
-      },
-    });
-    res.status(200).send({
-      hldCategory,
-      message: "Category",
-    });
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
-// Main Search Filter
-exports.SearchFilter = async (req, res, query) => {
+
+// Main Search Filter ( public ) - Query, Category, Price
+exports.SearchFilter = async (req, res, next) => {
   try {
     // code
     const { query, price, category } = req.body;
     if (query) {
-      console.log("Query:", query);
-      await hldQuery(req, res, query);
+      console.log("Mode: Query", query);
+      await handleQuery(req, res, query, next);
+    } else if (category) {
+      console.log("Mode: Category", category);
+      await handleCategory(req, res, category, next);
+    } else if (price) {
+      console.log("Mode: Category", price);
+      await handlePrice(req, res, price, next);
+    } else {
+      res.send({ SearchFilter: [], message: "No Filter Received" });
     }
-    if (price) {
-      console.log("Price:", price);
-      await hldPrice(req, res, price);
-    }
-    if (category) {
-      console.log("Category", category);
-      await hldCategory(req, res, category);
-    }
-    // res.send({ message: 'Search Product Successfully' });
   } catch (error) {
     next(error);
     res.status(500).json({
