@@ -21,7 +21,7 @@ router.get("/product/:id", authCheck, adminCheck, ReadProduct);
 router.put("/product/:id", authCheck, adminCheck, UpdateProducts);
 router.delete("/product/:id", authCheck, adminCheck, RemoveProduct);
 router.post("/product-by", authCheck, adminCheck, ListProductByFilters);
-router.post("/search/filter", authCheck, adminCheck, SearchFilter);
+router.post("/search/filter", SearchFilter);
 
 // Image Upload
 router.post("/image", authCheck, adminCheck, UploadImages);
