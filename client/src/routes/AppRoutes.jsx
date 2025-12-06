@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"; // insta
 import Home from "../pages/Home";
 import Shop from "../pages/Shop";
 import About from "../pages/About";
-import Cart from "../pages/Cart";
 import History from "../pages/History";
 import CheckOut from "../pages/CheckOut";
 import Login from "../pages/auth/Login";
@@ -18,6 +17,7 @@ import ProtectRouteAdmin from "./ProtectRouteAdmin";
 import Manage from "../pages/admin/Manage";
 import EditProduct from "../pages/admin/EditProduct";
 import Category from "../pages/admin/Category";
+import Contact from "../pages/Contact";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "shop", element: <Shop /> },
       { path: "about", element: <About /> },
-      { path: "cart", element: <Cart /> },
+      { path: "contact", element: <Contact /> },
       { path: "history", element: <History /> },
       { path: "checkout", element: <CheckOut /> },
       { path: "login", element: <Login /> },

@@ -5,11 +5,13 @@ import FoodBar from "../components/FoodBar";
 const LayoutUser = () => {
   return (
     <>
-      <MainNav />
-      <main>
-        <Outlet />
-      </main>
-      <FoodBar />
+      <div>
+        <MainNav />
+        <main>
+          <Outlet />
+        </main>
+        <FoodBar />
+      </div>
     </>
   );
 };

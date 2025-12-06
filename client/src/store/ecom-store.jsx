@@ -7,13 +7,16 @@ import {
   ReadProduct,
   SearchProducts,
 } from "../api/createProducts";
+import _ from "lodash";
 
-const ecomStore = (set) => ({
+const ecomStore = (set, get) => ({
   user: null,
   token: null,
   categories: [],
   products: [],
+  carts: [],
   readProduct: null,
+  isOpen: false,
   // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
     const res = await axios.post("http://localhost:5001/api/login", Data);
@@ -24,6 +27,30 @@ const ecomStore = (set) => ({
       token: res.data.token,
     });
     return res;
+  },
+  // Cart
+  actionAddToCart: async (item) => {
+    const carts = get().carts;
+    // 1. find product that on cart or not
+    const index = _.findIndex(carts, { id: item.id });
+    console.log("index", index);
+    // 🟢A have product - add plus (update count)
+    if (index !== -1) {
+      // New Array for safe
+      const newCarts = [...carts];
+      // direct to adjust by Original value is +1
+      newCarts[index] = {
+        ...newCarts[index],
+        count: newCarts[index].count + 1,
+      };
+      console.log("newCarts", newCarts);
+      set({ carts: newCarts }); // record
+    } else {
+      // 🔵 B not have product - (add new product )
+      set({
+        carts: [...carts, { ...item, count: 1 }],
+      });
+    }
   },
 
   // Categories ( public )
@@ -74,7 +101,10 @@ const ecomStore = (set) => ({
       console.error("Error searching products:", error);
     }
   },
-  // Search Category  ( public ) - Query
+
+  // --- Cart Action ---
+  actionOpenCart: () => set({ isOpen: true }),
+  actionCloseCart: () => set({ isOpen: false }),
 
   // Logout - clear store
   logout: () => {
