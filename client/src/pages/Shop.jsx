@@ -23,7 +23,7 @@ const Shop = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 1 Top Bar (Filter Mobile & Sort) */}
         <div className="flex items-center justify-between pb-6 border-b border-slate-200 mb-8">
-          {/* 1.1 Showing Products */}
+          {/* Showing Products */}
           <span className="text-slate-500 text-sm font-medium">
             Showing {getProducts?.length || 0} Products
           </span>

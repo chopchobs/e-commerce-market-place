@@ -10,14 +10,14 @@ npm install sonner
 npm install zustand
 npm install lucide-react
 npm install sweetalert2
+npm i rc-slider
+npm i lodash
 
 npm install @radix-ui/themes
 npm install @react-oauth/google@latest
 
 npm i react-image-file-resizer
 npm i react-icons
-npm i lodash
-npm i rc-slider
 npm i numeral
 npm install moment
 
