@@ -1,23 +1,30 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import useEcomStore from "../../store/ecom-store";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { icons } from "lucide-react";
 
 const Login = () => {
   // JS
   // redirect fly to
+  // zustand
+  const ActionLogin = useEcomStore((state) => state.actionLogin);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
+  // function - Role
   const roleNavigate = (role) => {
     if (role === "admin") {
       navigate("/admin"); // 👨🏼‍💼
     } else {
-      navigate("/user"); // 👨🏻‍💻
+      navigate(from, { replace: true }); // 👨🏻‍💻
     }
   };
-  // zustand
-  const ActionLogin = useEcomStore((state) => state.actionLogin);
-  //
+
+  // State - keep, update
   const [Data, setData] = useState({
     email: "",
     password: "",
@@ -28,10 +35,16 @@ const Login = () => {
     try {
       const resData = await ActionLogin(Data);
       const role = resData.data.payload.role;
+      Swal.fire({
+        title: resData?.data?.message,
+        icon: "success",
+      });
       roleNavigate(role);
-      toast.success(resData?.data?.message);
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      Swal.fire({
+        title: error?.response?.data?.message,
+        icon: "error",
+      });
     }
   };
 

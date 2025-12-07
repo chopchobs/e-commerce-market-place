@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const LoadingPage = ({
-  countStart = 2, // เริ่มนับถอยหลังจากเลขนี้
+  countStart = 3,
   redirectPath = "/",
-  enableRedirect = true, //  (เปิด/ปิด) นับถอยหลัง
+  enableRedirect = true,
 }) => {
   const [count, setCount] = useState(countStart);
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    // ถ้าไม่เปิดระบบ redirect ก็ไม่ต้องทำอะไร (return ออกเลย)
     if (!enableRedirect) return;
+
     const intervalId = setInterval(() => {
       setCount((currentCount) => {
         if (currentCount <= 1) {
@@ -22,34 +22,51 @@ const LoadingPage = ({
         return currentCount - 1;
       });
     }, 1000);
+
     return () => clearInterval(intervalId);
-  }, [enableRedirect]); // ใส่ dependency เพื่อความชัวร์
+  }, [enableRedirect]);
 
   if (redirect && enableRedirect) {
     return <Navigate to={redirectPath} />;
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white gap-4">
-      <div className="relative flex justify-center items-center">
-        {/* วงกลมพื้นหลังเด้งๆ */}
-        <div className="absolute animate-ping inline-flex h-16 w-16 rounded-full bg-green-100 opacity-75"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 font-sans">
+      {/* Container */}
+      <div className="relative flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 min-w-[300px]">
+        {/* ---  Animation --- */}
+        <div className="relative flex justify-center items-center mb-6">
+          {/*  (Pulse Effect) */}
+          <div className="absolute animate-ping inline-flex h-20 w-20 rounded-full bg-indigo-100 opacity-75"></div>
 
-        {/* ตัวหมุน Loading */}
-        <div className="relative animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-green-400 border-t-transparent shadow-md"></div>
+          {/*Loading (Spinning Ring) */}
+          {/* CSS Border */}
+          <div className="relative animate-spin rounded-full h-16 w-16 border-[3px] border-indigo-100 border-t-indigo-600 shadow-sm"></div>
 
-        {/* (Option) ใส่ตัวเลขนับถอยหลัง (โชว์เฉพาะตอนเปิด Redirect) */}
-        {enableRedirect && (
-          <div className="absolute text-green-600 font-bold text-sm">
-            {count}
-          </div>
-        )}
+          {/* Countdown number*/}
+          {enableRedirect && (
+            <div className="absolute flex items-center justify-center inset-0">
+              <span className="text-indigo-600 font-bold text-lg font-mono">
+                {count}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* --- text --- */}
+        <h3 className="text-lg font-bold text-slate-800 mb-2 tracking-tight">
+          {enableRedirect ? "Redirecting..." : "Loading..."}
+        </h3>
+
+        <p className="text-slate-400 text-sm text-center">
+          {enableRedirect
+            ? `Taking you to home page in ${count}s`
+            : "Please wait a moment"}
+        </p>
       </div>
 
-      {/* ข้อความบอกผู้ใช้ (เปลี่ยนตามโหมด) */}
-      <p className="text-gray-500 text-sm">
-        {enableRedirect ? "Redirecting in Home" : "Loading..."}
-      </p>
+      {/* Footer (Optional) */}
+      <div className="mt-8 text-xs text-slate-300">Secure Redirect System</div>
     </div>
   );
 };

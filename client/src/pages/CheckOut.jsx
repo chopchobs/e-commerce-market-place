@@ -11,26 +11,16 @@ import { Link, useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
 
 const CheckOut = () => {
+  const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
+  // const actionUpdateQuantity = useEcomStore(
+  //   (state) => state.actionUpdateQuantity
+  // );
+  // const actionRemoveProduct = useEcomStore(
+  //   (state) => state.actionRemoveProduct
+  // );
+  const carts = useEcomStore((state) => state.carts);
+  console.log("Carts", carts);
   const navigate = useNavigate();
-  // Mock Data (ถ้ายังไม่ได้ต่อ Store จริง)
-  const cartTotal = 3680;
-  const products = [
-    {
-      id: 1,
-      title: "Basic Tee",
-      price: 590,
-      count: 2,
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100",
-    },
-    {
-      id: 2,
-      title: "Urban Jacket",
-      price: 2500,
-      count: 1,
-      image: "https://images.unsplash.com/photo-1551028919-ac6635f0e5c9?w=100",
-    },
-  ];
 
   // State สำหรับเลือกวิธีชำระเงิน
   const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' or 'qr'
@@ -183,25 +173,38 @@ const CheckOut = () => {
                 Order Summary
               </h2>
 
-              {/* Product List (Mini) */}
-              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {products.map((item) => (
-                  <div key={item.id} className="flex gap-4">
-                    <div className="w-16 h-16 bg-slate-100 rounded-md overflow-hidden shrink-0">
+              {/* 1. Product List (Mini Scroller) */}
+              <div className="space-y-4 mb-6 max-h-320px overflow-y-auto pr-2 custom-scrollbar">
+                {carts.map((item) => (
+                  <div key={item.id} className="flex gap-4 items-start group">
+                    {/* Image with nice border */}
+                    <div className="w-16 h-16 bg-white rounded-lg border border-slate-200 overflow-hidden shrink-0 p-1">
                       <img
-                        src={item.image}
-                        className="w-full h-full object-cover"
+                        src={
+                          item.images && item.images.length > 0
+                            ? item.images[0].url
+                            : "https://placehold.co/100x100?text=No+Image"
+                        }
+                        alt={item.title}
+                        className="w-full h-full object-cover rounded-md"
                       />
                     </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-slate-800 truncate">
+
+                    {/* Text Info */}
+                    <div className="flex-1 min-w-0">
+                      {" "}
+                      {/* min-w-0 ช่วยให้ truncate ทำงาน */}
+                      <h4 className="text-sm font-semibold text-slate-800 truncate pr-2">
                         {item.title}
                       </h4>
-                      <div className="flex justify-between items-center mt-1">
-                        <span className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 mt-0.5 mb-1">
+                        Category: {item.category?.name || "-"}
+                      </p>
+                      <div className="flex justify-between items-end">
+                        <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
                           Qty: {item.count}
                         </span>
-                        <span className="text-sm font-bold text-slate-700">
+                        <span className="text-sm font-bold text-indigo-600">
                           ฿{(item.price * item.count).toLocaleString()}
                         </span>
                       </div>
@@ -210,30 +213,67 @@ const CheckOut = () => {
                 ))}
               </div>
 
-              <div className="border-t border-slate-100 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between text-slate-600">
+              {/* Divider */}
+              <div className="border-t border-slate-100 my-4"></div>
+
+              {/* 2. Totals Calculation */}
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
-                  <span>฿{cartTotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-                <div className="flex justify-between text-slate-800 font-bold text-lg pt-2">
-                  <span>Total</span>
-                  <span className="text-indigo-600">
-                    ฿{cartTotal.toLocaleString()}
+                  <span className="font-medium text-slate-700">
+                    ฿{actionTotalPrice().toLocaleString()}
                   </span>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>Shipping</span>
+                  <span className="text-green-600 font-medium">Free</span>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>VAT (7%)</span>
+                  {/* สมมติคำนวณ VAT ให้ดู (หรือจะใส่เป็น logic จริงก็ได้) */}
+                  <span className="font-medium text-slate-700">
+                    ฿{(actionTotalPrice() * 0.07).toLocaleString()}
+                  </span>
+                </div>
+
+                {/* Grand Total */}
+                <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-100">
+                  <span className="text-base font-bold text-slate-800">
+                    Total
+                  </span>
+                  <div className="text-right">
+                    <span className="text-2xl font-bold text-indigo-600">
+                      ฿{(actionTotalPrice() * 1.07).toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-slate-400 font-normal">
+                      Included all taxes
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <button className="w-full mt-6 bg-slate-900 text-white py-3.5 rounded-lg font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95">
+              {/* 3. Place Order Button */}
+              <button className="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-slate-200 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
                 Place Order
               </button>
 
+              {/* Trust Signal */}
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-                <Truck size={14} />
-                <span>Free shipping on all orders</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span>Secure SSL Encryption</span>
               </div>
             </div>
           </div>
