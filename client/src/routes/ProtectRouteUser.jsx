@@ -5,9 +5,8 @@ import LoadingPage from "./Loading"; //  Loading
 
 const ProtectRouteUser = ({ element }) => {
   // js
-  // Create State - check that "อนุญาต" หรือยัง (default = false)
+
   const [ok, setOk] = useState(false);
-  //  User , Token จาก Store
   const user = useEcomStore((state) => state.user); // user  👨🏻‍💻🌎
   const token = useEcomStore((state) => state.token); // token 🔑🌎
 
@@ -15,8 +14,7 @@ const ProtectRouteUser = ({ element }) => {
   useEffect(() => {
     // user  👨🏻‍💻🌎, token 🔑🌎
     if (user && token) {
-      // send to DB
-      CurrentUser(token) // API 🎯
+      CurrentUser(token) // API to DB 🎯
         .then((res) => {
           // ✅ ถ้าผ่าน: เปลี่ยนสถานะเป็น OK (อนุญาตให้เข้าหน้าเว็บ)
           setOk(true);

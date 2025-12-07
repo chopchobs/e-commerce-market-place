@@ -17,18 +17,36 @@ const ecomStore = (set, get) => ({
   carts: [],
   readProduct: null,
   isOpen: false,
-  // user , token 👨🏻‍💻
-  actionLogin: async (Data) => {
-    const res = await axios.post("http://localhost:5001/api/login", Data);
-    console.log(res);
-    // user , token 🌎
-    set({
-      user: res.data.payload,
-      token: res.data.token,
-    });
-    return res;
+  // --- Cart Action ---
+  actionOpenCart: () => set({ isOpen: true }),
+  actionCloseCart: () => set({ isOpen: false }),
+  // Calculated
+  actionTotalPrice: () => {
+    return get().carts.reduce((total, item) => {
+      return total + item.price * item.count;
+    }, 0);
   },
-  // Cart
+
+  // Update Quantity , Remove // Cart 🛒
+  actionUpdateQuantity: async (productId, newQuantity) => {
+    console.log("actionUpdateQuantity", productId, newQuantity);
+    set((state) => ({
+      carts: state.carts.map((item) => {
+        return item.id === productId
+          ? { ...item, count: Math.max(1, newQuantity) }
+          : item;
+      }),
+    }));
+  },
+  actionRemoveProduct: async (productId) => {
+    console.log("actionRemoveProduct");
+    set((state) => ({
+      carts: state.carts.filter((item) => {
+        return item.id !== productId;
+      }),
+    }));
+  },
+  // Cart Add
   actionAddToCart: async (item) => {
     const carts = get().carts;
     // 1. find product that on cart or not
@@ -64,7 +82,6 @@ const ecomStore = (set, get) => ({
       console.log(error);
     }
   },
-
   // Products ( public )
   listProduct: async (count) => {
     try {
@@ -76,7 +93,6 @@ const ecomStore = (set, get) => ({
       console.log(error);
     }
   },
-
   // Fetch Product Data by ID ( for Read , Update , Delete )
   fetchProduct: async (id) => {
     try {
@@ -89,7 +105,6 @@ const ecomStore = (set, get) => ({
       console.error("Error fetching product:", error);
     }
   },
-
   // SearchFilter ( public ) - Query, Category, Price
   actionSearchProduct: async (arg) => {
     try {
@@ -101,11 +116,18 @@ const ecomStore = (set, get) => ({
       console.error("Error searching products:", error);
     }
   },
-
-  // --- Cart Action ---
-  actionOpenCart: () => set({ isOpen: true }),
-  actionCloseCart: () => set({ isOpen: false }),
-
+  // --------------------  System --------------------
+  // user , token 👨🏻‍💻
+  actionLogin: async (Data) => {
+    const res = await axios.post("http://localhost:5001/api/login", Data);
+    console.log(res);
+    // user , token 🌎
+    set({
+      user: res.data.payload,
+      token: res.data.token,
+    });
+    return res;
+  },
   // Logout - clear store
   logout: () => {
     set({

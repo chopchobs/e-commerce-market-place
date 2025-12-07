@@ -1,44 +1,59 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Register = () => {
   // JS
-  const [Form, setForm] = useState({
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState({
     email: "",
     password: "",
     confirmPassword: "",
   });
   // handle
   const hldOnChangeInput = (e) => {
-    // console.log(e.target.name, e.target.value);
     setForm({
-      ...Form,
-      // key:value
+      ...form,
       [e.target.name]: e.target.value,
     });
   };
   const hldSubmitInform = async (e) => {
-    e.preventDefault(); // not reset
-    if (Form.password !== Form.confirmPassword) {
-      return toast.warning("Password is not match !!");
+    e.preventDefault();
+    // Validate Password
+    if (form.password !== form.confirmPassword) {
+      return Swal.fire({
+        title: "Password is not match !!",
+        icon: "warning",
+      });
     }
+    setIsLoading(true);
     // TO DB
     try {
-      const res = await axios.post("http://localhost:5001/api/register", Form);
-      // console.log(resFront.data);
-      toast.success(res.data.message); // ✅
+      const res = await axios.post("http://localhost:5001/api/register", form);
+      Swal.fire({
+        title: "Register Success!",
+        text: res.data.message,
+        icon: "success",
+      }).then(() => {
+        navigate("/login");
+      });
     } catch (error) {
-      const errMessage = error?.response?.data?.message;
-      // console.log(errMessage);
-      toast.error(errMessage); // ⛔️
+      console.log(error);
+      Swal.fire({
+        title: "Register Failed",
+        text: error?.response?.data?.message || "Something went wrong",
+        icon: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
-    // 1. Background & Center Layout: พื้นหลังสีเทาจางๆ ช่วยดันให้ Card ตรงกลางเด่นขึ้น
+    // 1. Background & Center Layout:
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      {/* 2. The Card: กล่องสีขาว มุมโค้ง มีเงา และขอบบางๆ */}
+      {/* The Card */}
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl border border-gray-100">
         {/* Header Section */}
         <div className="text-center">
@@ -80,7 +95,7 @@ const Register = () => {
               <input
                 onChange={hldOnChangeInput}
                 name="password"
-                type="text"
+                type="password"
                 required
                 className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-black sm:text-sm outline-none transition-all"
               />
@@ -97,7 +112,7 @@ const Register = () => {
                 <input
                   onChange={hldOnChangeInput}
                   name="confirmPassword"
-                  type="text"
+                  type="password"
                   required
                   className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-black sm:text-sm outline-none transition-all"
                 />

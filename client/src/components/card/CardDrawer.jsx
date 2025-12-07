@@ -3,20 +3,27 @@ import useEcomStore from "../../store/ecom-store";
 import { Link, useNavigate } from "react-router-dom";
 
 const CartDrawer = () => {
+  // zustand
+  const user = useEcomStore((state) => state.user);
   const navigate = useNavigate();
   const actionCloseCart = useEcomStore((state) => state.actionCloseCart);
   const isOpen = useEcomStore((state) => state.isOpen);
   const carts = useEcomStore((state) => state.carts);
-  // const actionUpdateQuantity = useEcomStore(
-  //   (state) => state.actionUpdateQuantity
-  // );
-  // const actionRemoveProduct = useEcomStore(
-  //   (state) => state.actionRemoveProduct
-  // );
+  const actionUpdateQuantity = useEcomStore(
+    (state) => state.actionUpdateQuantity
+  );
+  const actionRemoveProduct = useEcomStore(
+    (state) => state.actionRemoveProduct
+  );
+  const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
 
-  // calculated
-  const getTotalPrice = () => {
-    return carts.reduce((total, item) => total + item.price * item.count, 0);
+  const hldCheckOut = () => {
+    actionCloseCart();
+    if (!user) {
+      navigate("/login", { state: { from: { pathname: "/checkout" } } });
+    } else {
+      navigate("/checkout");
+    }
   };
 
   return (
@@ -77,11 +84,9 @@ const CartDrawer = () => {
                       <h3 className="text-sm font-bold text-slate-800 line-clamp-2 pr-4">
                         {item.title}
                       </h3>
-                      {/* ปุ่มลบสินค้า (ถ้ามี actionRemoveProduct) */}
+                      {/* actionRemoveProduct - Remove 🗑️ 🛑 */}
                       <button
-                        onClick={() =>
-                          actionRemoveProduct && actionRemoveProduct(item.id)
-                        }
+                        onClick={() => actionRemoveProduct(item.id)}
                         className="text-slate-300 hover:text-red-500 transition-colors"
                       >
                         <Trash2 size={16} />
@@ -95,13 +100,23 @@ const CartDrawer = () => {
                   <div className="flex items-end justify-between">
                     {/* Quantity Control */}
                     <div className="flex items-center border border-slate-200 rounded-lg h-8">
-                      <button className="px-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 h-full rounded-l-lg transition-colors">
+                      <button
+                        onClick={() =>
+                          actionUpdateQuantity(item.id, item.count - 1)
+                        }
+                        className="px-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 h-full rounded-l-lg transition-colors"
+                      >
                         <Minus size={14} />
                       </button>
                       <span className="w-8 text-center text-xs font-semibold text-slate-700">
                         {item.count}
                       </span>
-                      <button className="px-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 h-full rounded-r-lg transition-colors">
+                      <button
+                        onClick={() =>
+                          actionUpdateQuantity(item.id, item.count + 1)
+                        }
+                        className="px-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 h-full rounded-r-lg transition-colors"
+                      >
                         <Plus size={14} />
                       </button>
                     </div>
@@ -137,7 +152,7 @@ const CartDrawer = () => {
             <div className="flex justify-between items-center mb-4">
               <span className="text-slate-600 font-medium">Subtotal</span>
               <span className="text-xl font-extrabold text-slate-900">
-                ฿{getTotalPrice().toLocaleString()}
+                ฿{actionTotalPrice().toLocaleString()}
               </span>
             </div>
 
@@ -145,13 +160,12 @@ const CartDrawer = () => {
               Shipping and taxes calculated at checkout.
             </p>
 
-            <Link
-              to="/checkout" // checkout
-              onClick={actionCloseCart} // กดแล้วปิดตะกร้าด้วย
+            <button
+              onClick={hldCheckOut}
               className="w-full flex items-center justify-center bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95"
             >
               View Full Cart
-            </Link>
+            </button>
           </div>
         )}
       </div>
