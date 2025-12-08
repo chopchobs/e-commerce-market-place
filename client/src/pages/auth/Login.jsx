@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import useEcomStore from "../../store/ecom-store";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { icons } from "lucide-react";
 
 const Login = () => {
   // JS

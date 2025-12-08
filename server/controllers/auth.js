@@ -38,7 +38,6 @@ exports.register = async (req, res, next) => {
     });
     res.status(200).send({
       user,
-      message: "Registration Successful",
     });
   } catch (error) {
     next(error);
@@ -80,7 +79,7 @@ exports.login = async (req, res, next) => {
       if (err) {
         return res.status(500).json({ message: "Server Error!!" });
       }
-      res.status(200).json({ payload, token, message: "Login successful" });
+      res.status(200).json({ payload, token, message: "Welcome Back!" });
     });
   } catch (error) {
     next(error);

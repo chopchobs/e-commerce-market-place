@@ -1,14 +1,16 @@
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import useEcomStore from "../../store/ecom-store";
 import { Link, useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
+import { createUserCart } from "../../api/user";
 const CartDrawer = () => {
   // zustand
   const user = useEcomStore((state) => state.user);
+  const token = useEcomStore((state) => state.token);
   const navigate = useNavigate();
   const actionCloseCart = useEcomStore((state) => state.actionCloseCart);
   const isOpen = useEcomStore((state) => state.isOpen);
-  const carts = useEcomStore((state) => state.carts);
+  const cart = useEcomStore((state) => state.carts);
   const actionUpdateQuantity = useEcomStore(
     (state) => state.actionUpdateQuantity
   );
@@ -17,17 +19,31 @@ const CartDrawer = () => {
   );
   const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
 
-  const hldCheckOut = () => {
-    actionCloseCart();
+  // Handle List Cart
+  const hldSaveCartCheckOut = async () => {
+    actionCloseCart(); // close cart
+    // Validate User
     if (!user) {
       navigate("/login", { state: { from: { pathname: "/checkout" } } });
-    } else {
+      return;
+    }
+    // Success Login
+    try {
+      const res = await createUserCart(token, { cart });
+      console.log(res);
       navigate("/checkout");
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        title: "Error Saving Cart",
+        text: "Please try again",
+        icon: "error",
+      });
     }
   };
 
   return (
-    // 1. Overlay (ฉากหลังมืด)
+    // 1. Overlay (Dark)
     <div
       className={`fixed inset-0 z-50 flex justify-end transition-opacity duration-300 ${
         isOpen
@@ -35,13 +51,13 @@ const CartDrawer = () => {
           : "opacity-0 invisible pointer-events-none"
       }`}
     >
-      {/* 2. Backdrop (กดพื้นหลังเพื่อปิด) */}
+      {/* 2. Backdrop (Click on Back space for close cart) */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={actionCloseCart}
       />
 
-      {/* 3. Drawer (ตัวตะกร้า) */}
+      {/* 3. Drawer (Body Cart) */}
       <div
         className={`relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -50,7 +66,7 @@ const CartDrawer = () => {
         {/* --- Header --- */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-white z-10">
           <h2 className="text-lg font-bold text-slate-800">
-            Shopping Cart ({carts.length})
+            Shopping Cart ({cart.length})
           </h2>
           <button
             onClick={actionCloseCart}
@@ -62,8 +78,8 @@ const CartDrawer = () => {
 
         {/* --- Body (รายการสินค้า) --- */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {carts.length > 0 ? (
-            carts.map((item) => (
+          {cart.length > 0 ? (
+            cart.map((item) => (
               <div key={item.id} className="flex gap-4 group">
                 {/* Image */}
                 <div className="w-24 h-24 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200">
@@ -147,7 +163,7 @@ const CartDrawer = () => {
         </div>
 
         {/* --- Footer (ปุ่มจ่ายเงิน) --- */}
-        {carts.length > 0 && (
+        {cart.length > 0 && (
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
             <div className="flex justify-between items-center mb-4">
               <span className="text-slate-600 font-medium">Subtotal</span>
@@ -161,7 +177,7 @@ const CartDrawer = () => {
             </p>
 
             <button
-              onClick={hldCheckOut}
+              onClick={hldSaveCartCheckOut}
               className="w-full flex items-center justify-center bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95"
             >
               View Full Cart

@@ -299,41 +299,55 @@ cloudinary.config({
 exports.UploadImages = async (req, res, next) => {
   try {
     // json
-    const uploadResult = await cloudinary.uploader.upload(req.body.images, {
-      public_id: `Image Product-${Date.now()}`,
+    const images = req.body.images;
+    // Validate images
+    if (!images) {
+      return res.status(400).json({ message: "No image provided" });
+    }
+    // Upload images
+    const uploadResult = await cloudinary.uploader.upload(images, {
+      // เพิ่ม Random กันไฟล์ชื่อซ้ำระดับมิลลิวินาที
+      public_id: `Product-${Date.now()}-${Math.round(Math.random() * 1000)}`,
       resource_type: "auto",
       folder: "ImageProduct-Ecom",
     });
-    console.log(req.body);
+    // Response
     res.status(200).json({
       uploadResult,
+      message: "Upload success",
     });
   } catch (error) {
-    next(error);
+    console.log("Cloudinary Upload Error:", error);
     res.status(500).json({
-      message: "Failed Upload !! ",
+      message: "Server Error: Failed to upload image",
     });
   }
 };
+
 // Image - Remove
 exports.RemoveImage = async (req, res, next) => {
   try {
     // json
     const { public_id } = req.body;
-    cloudinary.uploader.destroy(public_id, (error, result) => {
-      if (error) {
-        console.log("Error deleting image:", error);
-        return res.status(500).json({ message: "Failed to delete image" });
-      }
+    //Validated
+    if (!public_id) {
+      return res.status(400).json({ message: "No Public ID provided" });
+    }
+    const result = await cloudinary.uploader.destroy(public_id);
+    // check cloudinary send back - { result: 'ok' }, 'not found'
+    if (result.result === "ok") {
       res.status(200).json({
-        result,
-        message: "Image Deleted Successfully !! ",
+        message: "Image Deleted Successfully!!",
       });
-    });
+    } else {
+      res.status(400).json({
+        message: "Image not found or already deleted",
+      });
+    }
   } catch (error) {
-    next(error);
+    console.log("Remove Image Error:", error);
     res.status(500).json({
-      message: "Failed Remove Image !! ",
+      message: "Server Error: Failed to remove image",
     });
   }
 };
