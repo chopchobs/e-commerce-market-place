@@ -30,7 +30,7 @@ const FormProducts = () => {
   const fetchCategories = useEcomStore((state) => state.fetchCategories);
   const listProduct = useEcomStore((state) => state.listProduct);
   const products = useEcomStore((state) => state.products);
-  const [isLoading, SetIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // Local State (Form) 📦
   const [form, setForm] = useState({
     title: "",
@@ -44,6 +44,22 @@ const FormProducts = () => {
     fetchCategories(); // โหลดหมวดหมู่ตอนเริ่มต้น
     listProduct(20); // เรียกจำนวน 20 รายการเพื่อแสดงผล
   }, []);
+  // Resizer to Promise (for use await )
+  const resizeFile = (file) =>
+    new Promise((resolve) => {
+      Resizer.imageFileResizer(
+        file,
+        720,
+        720,
+        "JPEG",
+        100,
+        0,
+        (uri) => {
+          resolve(uri);
+        },
+        "base64"
+      );
+    });
   // Handle - Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,85 +121,94 @@ const FormProducts = () => {
     });
   };
   // Handle - Upload Image
-  const handleChangeImages = (e) => {
+  const handleChangeImages = async (e) => {
     const files = e.target.files;
-    if (files) {
-      SetIsLoading(true);
-      let allFiles = form.images; // [] empty array
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        // Validate Type
-        if (!file.type.startsWith("image/")) {
-          Swal.fire({
-            title: `File ${file.name} is not an image!`,
-            icon: "warning",
-          });
-          continue;
+    if (files || files.length > 0) {
+      setIsLoading(true);
+      try {
+        // Array - keep files all
+        const tasks = Array.from(files).map(async (file) => {
+          // validate files
+          if (!file.type.startsWith("image/")) {
+            return null;
+          }
+          // Resize & Upload
+          const resizedImage = await resizeFile(file);
+          return UploadImages(token, resizedImage)
+            .then((res) => res.data.uploadResult)
+            .catch((error) => {
+              console.log("Upload Error:", error);
+              return null;
+            });
+        });
+        // wait all
+        const results = await Promise.all(tasks);
+        // filter not null
+        const successImages = results.filter((img) => img !== null);
+        // Update State
+        if (successImages.length > 0) {
+          setForm((prevForm) => ({
+            ...prevForm,
+            images: [...prevForm.images, ...successImages], // old + new
+          }));
         }
-        // Resize & Upload
-        Resizer.imageFileResizer(
-          file,
-          720,
-          720,
-          "JPEG",
-          100,
-          0,
-          // data after resizing
-          async (data) => {
-            // Endpoint Upload API
-            await UploadImages(token, data)
-              .then((res) => {
-                allFiles.push(res.data.uploadResult);
-                console.log(res.data);
-                setForm({
-                  ...form,
-                  images: allFiles,
-                });
-                Swal.fire({
-                  title: "Upload Success!!",
-                  icon: "success",
-                });
-                SetIsLoading(false);
-              })
-              .catch((error) => {
-                console.log(error);
-                Swal.fire({
-                  title: "Upload Failed!!",
-                  icon: "error",
-                });
-                SetIsLoading(false);
-              });
-          },
-          "base64" // output type
-        );
+        Swal.fire({
+          title: "Upload Success!!",
+          text: `Uploaded ${successImages.length} images.`,
+          icon: "success",
+        });
+      } catch (error) {
+        console.log(error);
+        Swal.fire({
+          title: "Upload Error!!",
+          icon: "error",
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
   // Handle - Remove Image
   const handleRemoveImage = async (public_id) => {
-    const images = form.images;
-    // Call API to remove from server
-    await RemoveImage(token, public_id)
-      .then(async (res) => {
-        // Filter out the removed image from the form's images array
-        const updatedImages = await images.filter((item) => {
-          return item.public_id !== public_id;
-        });
+    // safety first
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to reserver this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+    // Cancel
+    if (!result.isConfirmed) result;
+    setIsLoading(true);
+    // call API
+    RemoveImage(token, public_id)
+      .then((res) => {
+        setForm((prevForm) => ({
+          ...prevForm,
+          images: prevForm.images.filter(
+            (item) => item.public_id !== item.public_id
+          ),
+        }));
         Swal.fire({
-          title: res.data.message || "Image removed successfully",
+          title: "Deleted!",
+          text: res.data.message || "Image has been deleted.",
           icon: "success",
-        });
-        setForm({
-          ...form,
-          images: updatedImages,
+          timer: 1500,
         });
       })
       .catch((error) => {
         console.log(error);
         Swal.fire({
-          title: "Failed to remove image",
+          title: "Failed!",
+          text: "Could not remove image.",
           icon: "error",
         });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
   return (
@@ -321,7 +346,7 @@ const FormProducts = () => {
                   {form.images.map((item, index) => (
                     <div
                       key={index}
-                      className="relative group w-full h-32 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm"
+                      className="relative group w-full h-55 bg-slate-200 rounded-lg border border-slate-300 overflow-hidden shadow-sm"
                     >
                       {/* Picture */}
                       <img

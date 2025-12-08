@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CreditCard,
   QrCode,
@@ -9,21 +9,29 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
+import { listUserCart } from "../api/user";
 
 const CheckOut = () => {
-  const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
-  // const actionUpdateQuantity = useEcomStore(
-  //   (state) => state.actionUpdateQuantity
-  // );
-  // const actionRemoveProduct = useEcomStore(
-  //   (state) => state.actionRemoveProduct
-  // );
-  const carts = useEcomStore((state) => state.carts);
-  console.log("Carts", carts);
+  const token = useEcomStore((state) => state.token);
   const navigate = useNavigate();
-
-  // State สำหรับเลือกวิธีชำระเงิน
-  const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' or 'qr'
+  const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
+  const cart = useEcomStore((state) => state.carts);
+  // State สำหรับเลือกวิธีชำระเงิน \ 'card' or 'qr'
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    if (token) {
+      hldGetUserCart(token);
+    }
+  }, [token]);
+  const hldGetUserCart = async (token) => {
+    try {
+      const res = await listUserCart(token);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 font-sans">
@@ -175,7 +183,7 @@ const CheckOut = () => {
 
               {/* 1. Product List (Mini Scroller) */}
               <div className="space-y-4 mb-6 max-h-320px overflow-y-auto pr-2 custom-scrollbar">
-                {carts.map((item) => (
+                {cart.map((item) => (
                   <div key={item.id} className="flex gap-4 items-start group">
                     {/* Image with nice border */}
                     <div className="w-16 h-16 bg-white rounded-lg border border-slate-200 overflow-hidden shrink-0 p-1">
@@ -253,7 +261,10 @@ const CheckOut = () => {
               </div>
 
               {/* 3. Place Order Button */}
-              <button className="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-slate-200 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
+              <button
+                onClick={hldGetUserCart}
+                className="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-slate-200 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2"
+              >
                 Place Order
               </button>
 

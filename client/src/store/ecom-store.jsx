@@ -9,7 +9,7 @@ import {
 } from "../api/createProducts";
 import _ from "lodash";
 
-const ecomStore = (set, get) => ({
+const initialState = {
   user: null,
   token: null,
   categories: [],
@@ -17,6 +17,10 @@ const ecomStore = (set, get) => ({
   carts: [],
   readProduct: null,
   isOpen: false,
+};
+
+const ecomStore = (set, get) => ({
+  ...initialState,
   // --- Cart Action ---
   actionOpenCart: () => set({ isOpen: true }),
   actionCloseCart: () => set({ isOpen: false }),
@@ -26,7 +30,6 @@ const ecomStore = (set, get) => ({
       return total + item.price * item.count;
     }, 0);
   },
-
   // Update Quantity , Remove // Cart 🛒
   actionUpdateQuantity: async (productId, newQuantity) => {
     console.log("actionUpdateQuantity", productId, newQuantity);
@@ -128,25 +131,18 @@ const ecomStore = (set, get) => ({
     });
     return res;
   },
-  // Logout - clear store
+  // Logout (Reset to Initial State)
   logout: () => {
-    set({
-      user: null,
-      token: null,
-      categories: [],
-      products: [],
-      readProduct: null,
-    });
-    // Clear persisted store from localStorage
+    set(initialState);
     localStorage.removeItem("ecom-store");
   },
 });
-// persist store to localStorage
+
+// Persist Store
 const useEcomStore = create(
   persist(ecomStore, {
     name: "ecom-store",
     storage: createJSONStorage(() => localStorage),
-    // (Optional) specify localStorage
   })
 );
 

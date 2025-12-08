@@ -47,24 +47,32 @@ model Product {
 model Order {
   id              Int              @id @default(autoincrement())
   products        ProductOnOrder[]
-  cartTotal       Float
-  orderStatus     String           @default("Not Process")
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
   orderedBy       User             @relation(fields: [orderedById], references: [id])
   orderedById     Int
-  stripePaymentId String
-  amount          Int
-  status          String
-  currentcy       String
+  // --- ข้อมูลเงิน ---
+  cartTotal       Float
+  shipping        Float            @default(0)
+  orderTotal      Float            @default(0)
+  // --- สถานะ ---
+  orderStatus     String           @default("Not Process")
+  // --- ข้อมูลจัดส่ง ---
+  address         String?
+  // ---  Payment (Stripe) ---
+  stripePaymentId String?
+  amount          Int?
+  status          String?
+  currency        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductOnOrder {
   id        Int     @id @default(autoincrement())
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
   count     Int
   price     Float
 }
