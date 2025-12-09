@@ -30,7 +30,7 @@ exports.AddProduct = async (req, res, next) => {
       message: "Create Product successfully",
     });
   } catch (error) {
-    next(error);
+    console.log(error);
     res.status(500).json({ message: "Failed to Create Product" });
   }
 };

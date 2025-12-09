@@ -1,33 +1,80 @@
-import React, { useState, useEffect } from "react";
-import {
-  CreditCard,
-  QrCode,
-  MapPin,
-  Truck,
-  ChevronLeft,
-  Wallet,
-} from "lucide-react";
+import React, { useState, useEffect, use } from "react";
+import { MapPin, ChevronLeft, Wallet, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
-import { listUserCart } from "../api/user";
+import { addressUserCart, listUserCart } from "../api/user";
+import Swal from "sweetalert2";
 
 const CheckOut = () => {
   const token = useEcomStore((state) => state.token);
   const navigate = useNavigate();
-  const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
-  const cart = useEcomStore((state) => state.carts);
-  // State สำหรับเลือกวิธีชำระเงิน \ 'card' or 'qr'
-  const [paymentMethod, setPaymentMethod] = useState("card");
+
   const [products, setProducts] = useState([]);
+  const [cartTotal, setCartTotal] = useState(0);
+  const [shipping, setShipping] = useState(0);
+  const [vat, setVat] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  // state address
+  const [address, setAddress] = useState({
+    address: "",
+    email: "",
+    name: "",
+    phoneNumber: "",
+  });
+
   useEffect(() => {
     if (token) {
-      hldGetUserCart(token);
+      fetchData(token);
     }
   }, [token]);
-  const hldGetUserCart = async (token) => {
+  // FetchData
+  const fetchData = async (token) => {
     try {
       const res = await listUserCart(token);
-      console.log(res);
+      setProducts(res.data.products || []);
+      setCartTotal(res.data.cartTotal || 0);
+      setShipping(res.data.shipping || 0);
+      setVat(res.data.vat || 0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // Set - address
+  const handleChangeAddress = (e) => {
+    setAddress({
+      ...address,
+      [e.target.name]: e.target.value,
+    });
+  };
+  // Handle Confirm Order
+  const hldConfirmOrder = async () => {
+    // validate
+    if (
+      !address.address ||
+      !address.email ||
+      !address.name ||
+      !address.phoneNumber
+    ) {
+      return Swal.fire({
+        title: "Please fill in all address fields",
+        icon: "warning",
+      });
+    }
+    setIsLoading(true);
+
+    try {
+      // Save Address
+      await addressUserCart(token, address);
+
+      // 📦 3. Prepare Payload
+      // const payload = {
+      //   address: `${address.name} (${address.phoneNumber}) ${address.address}`,
+      //   amount: Math.round((cartTotal + vat + shipping) * 100),
+      //   currency: "thb",
+      //   status: "pending",
+      //   stripePaymentId: "",
+      // };
+      // navigate("/user/payment");
     } catch (error) {
       console.log(error);
     }
@@ -59,6 +106,8 @@ const CheckOut = () => {
                     Full Name
                   </label>
                   <input
+                    onChange={handleChangeAddress}
+                    name="name"
                     type="text"
                     placeholder="John Doe"
                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
@@ -69,6 +118,8 @@ const CheckOut = () => {
                     Phone Number
                   </label>
                   <input
+                    onChange={handleChangeAddress}
+                    name="phoneNumber"
                     type="text"
                     placeholder="081-234-5678"
                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
@@ -79,6 +130,8 @@ const CheckOut = () => {
                     Email Address
                   </label>
                   <input
+                    onChange={handleChangeAddress}
+                    name="email"
                     type="email"
                     placeholder="john@example.com"
                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
@@ -89,6 +142,8 @@ const CheckOut = () => {
                     Address
                   </label>
                   <textarea
+                    onChange={handleChangeAddress}
+                    name="address"
                     rows="3"
                     placeholder="123 Street, District, Province, Zip Code"
                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all resize-none"
@@ -96,196 +151,108 @@ const CheckOut = () => {
                 </div>
               </div>
             </div>
-
-            {/* 2. Payment Method */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <Wallet className="text-indigo-600" /> Payment Method
-              </h2>
-
-              {/* Selector Buttons */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <button
-                  onClick={() => setPaymentMethod("card")}
-                  className={`flex items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all ${
-                    paymentMethod === "card"
-                      ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                      : "border-slate-100 hover:border-slate-300 text-slate-600"
-                  }`}
-                >
-                  <CreditCard size={20} /> Credit/Debit Card
-                </button>
-                <button
-                  onClick={() => setPaymentMethod("qr")}
-                  className={`flex items-center justify-center gap-2 py-4 rounded-lg border-2 transition-all ${
-                    paymentMethod === "qr"
-                      ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                      : "border-slate-100 hover:border-slate-300 text-slate-600"
-                  }`}
-                >
-                  <QrCode size={20} /> QR PromptPay
-                </button>
-              </div>
-
-              {/* Conditional Content */}
-              {paymentMethod === "card" ? (
-                <div className="space-y-4 animate-fade-in">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Card Number
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="0000 0000 0000 0000"
-                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
-                        Expiry Date
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="MM/YY"
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">
-                        CVV
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="123"
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-300 animate-fade-in">
-                  <QrCode size={48} className="mx-auto text-slate-400 mb-3" />
-                  <p className="text-slate-500 text-sm">
-                    QR Code will be generated after you place order.
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Payment Stripe */}
           </div>
 
-          {/* --- RIGHT COLUMN: Order Summary (Sticky) --- */}
+          {/* --- RIGHT COLUMN: Order Summary (Ultra Minimal - Text Only) --- */}
           <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 sticky top-6">
-              <h2 className="text-xl font-bold text-slate-800 mb-6">
+            <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-6">
+              <h2 className="text-xl font-bold text-slate-800 mb-8 tracking-tight">
                 Order Summary
               </h2>
 
-              {/* 1. Product List (Mini Scroller) */}
-              <div className="space-y-4 mb-6 max-h-320px overflow-y-auto pr-2 custom-scrollbar">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-4 items-start group">
-                    {/* Image with nice border */}
-                    <div className="w-16 h-16 bg-white rounded-lg border border-slate-200 overflow-hidden shrink-0 p-1">
-                      <img
-                        src={
-                          item.images && item.images.length > 0
-                            ? item.images[0].url
-                            : "https://placehold.co/100x100?text=No+Image"
-                        }
-                        alt={item.title}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                    </div>
-
-                    {/* Text Info */}
-                    <div className="flex-1 min-w-0">
-                      {" "}
-                      {/* min-w-0 ช่วยให้ truncate ทำงาน */}
-                      <h4 className="text-sm font-semibold text-slate-800 truncate pr-2">
-                        {item.title}
+              {/* 1. Product List (Text Only) */}
+              <div className="space-y-6 mb-8 max-h-320px overflow-y-auto pr-4 custom-scrollbar font-medium">
+                {products.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-start group py-1"
+                  >
+                    {/* Info (No Image) */}
+                    <div className="flex-1 pr-4">
+                      <h4 className="text-sm font-bold text-slate-700 leading-tight">
+                        {item.product?.title}
                       </h4>
-                      <p className="text-xs text-slate-500 mt-0.5 mb-1">
-                        Category: {item.category?.name || "-"}
-                      </p>
-                      <div className="flex justify-between items-end">
-                        <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                          Qty: {item.count}
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-1.5 font-normal">
+                        <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">
+                          x{item.count}
                         </span>
-                        <span className="text-sm font-bold text-indigo-600">
-                          ฿{(item.price * item.count).toLocaleString()}
-                        </span>
+                        <span> ฿{item.price.toLocaleString()}</span>
                       </div>
                     </div>
+
+                    {/* Item Total */}
+                    <span className="text-sm font-bold text-slate-800 font-mono">
+                      ฿{(item.price * item.count).toLocaleString()}
+                    </span>
                   </div>
                 ))}
               </div>
 
-              {/* Divider */}
-              <div className="border-t border-slate-100 my-4"></div>
+              {/* Divider (Solid thin) */}
+              <div className="border-t border-slate-100 my-6"></div>
 
-              {/* 2. Totals Calculation */}
-              <div className="space-y-3 text-sm">
+              {/* 2. Calculation Details */}
+              <div className="space-y-3 text-sm font-medium">
                 <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
-                  <span className="font-medium text-slate-700">
-                    ฿{actionTotalPrice().toLocaleString()}
+                  <span className="text-slate-700">
+                    ฿{cartTotal.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-500">
                   <span>Shipping</span>
-                  <span className="text-green-600 font-medium">Free</span>
+                  <span className="text-emerald-600">{shipping}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
                   <span>VAT (7%)</span>
-                  {/* สมมติคำนวณ VAT ให้ดู (หรือจะใส่เป็น logic จริงก็ได้) */}
-                  <span className="font-medium text-slate-700">
-                    ฿{(actionTotalPrice() * 0.07).toLocaleString()}
+                  <span className="text-slate-700">
+                    ฿
+                    {vat.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
+              </div>
 
-                {/* Grand Total */}
-                <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-100">
-                  <span className="text-base font-bold text-slate-800">
+              {/* Divider (Solid thick) */}
+              <div className="border-t-2 border-slate-800/5 my-6"></div>
+
+              {/* 3. Grand Total */}
+              <div className="flex justify-between items-end mb-8">
+                <div>
+                  <span className="text-base font-black text-slate-800 block uppercase tracking-wider">
                     Total
                   </span>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold text-indigo-600">
-                      ฿{(actionTotalPrice() * 1.07).toLocaleString()}
-                    </span>
-                    <p className="text-[10px] text-slate-400 font-normal">
-                      Included all taxes
-                    </p>
-                  </div>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    THB (Inc. VAT)
+                  </span>
                 </div>
+                <span className="text-3xl font-black text-indigo-700 tracking-tight font-mono leading-none">
+                  ฿
+                  {(cartTotal * 1.07).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
 
-              {/* 3. Place Order Button */}
+              {/* 4. Action Button */}
+              {/* Action Button */}
               <button
-                onClick={hldGetUserCart}
-                className="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg shadow-slate-200 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2"
+                onClick={hldConfirmOrder}
+                disabled={isLoading}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Place Order
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Confirm Payment"
+                )}
               </button>
 
-              {/* Trust Signal */}
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span>Secure SSL Encryption</span>
-              </div>
+              <p className="text-center text-xs text-slate-400 mt-4">
+                By confirming, you agree to our Terms & Conditions.
+              </p>
             </div>
           </div>
         </div>

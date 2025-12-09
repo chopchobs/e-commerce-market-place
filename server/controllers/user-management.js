@@ -71,7 +71,7 @@ exports.AddChangeRole = async (req, res, next) => {
 };
 
 // Cart Add - (.post)
-exports.UserCart = async (req, res, next) => {
+exports.createUserCart = async (req, res, next) => {
   try {
     // code
     const { cart } = req.body;
@@ -126,7 +126,7 @@ exports.UserCart = async (req, res, next) => {
   }
 };
 // Cart List - (.get)
-exports.getUserCart = async (req, res, next) => {
+exports.listUserCart = async (req, res, next) => {
   try {
     // code
     const { id } = req.user;
@@ -145,16 +145,30 @@ exports.getUserCart = async (req, res, next) => {
     // Not Have Cart
     if (!UserCart) {
       return res.status(200).json({
-        products: [], // ส่ง array ว่าง
-        cartTotal: 0, // ยอดเงิน 0
+        products: [],
+        cartTotal: 0,
         message: "No cart found",
       });
     }
-    // Have Cart
+
+    // Calculate
+    const cartTotal = UserCart.cartTotal;
+    const shipping = 0; // defeat 0
+    const vatRate = 0.07; // TEXT 7%
+    const vatAmount = cartTotal * vatRate;
+    const netTotal = cartTotal + vatAmount + shipping;
+
+    // ส่งกลับไปให้หน้าบ้านใช้
     res.status(200).json({
       UserCartId: UserCart.id,
       products: UserCart.products,
-      cartTotal: UserCart.cartTotal,
+      cartTotal: cartTotal, // ราคาสินค้าล้วน
+
+      // 👇 ส่งค่าที่คำนวณเพิ่มไปด้วย
+      shipping: shipping,
+      vat: vatAmount,
+      netTotal: netTotal, // ยอดสุทธิ (รวมทุกอย่าง)
+
       message: `List product's User Cart Successfully!!`,
     });
   } catch (error) {
@@ -202,13 +216,15 @@ exports.saveAddress = async (req, res, next) => {
   try {
     // code
     const { id } = req.user;
-    const { address } = req.body;
+    const { address, name, phoneNumber } = req.body;
     const addressUser = await prisma.user.update({
       where: {
         id: Number(id),
       },
       data: {
         address: address,
+        name: name,
+        phoneNumber: phoneNumber,
       },
     });
     res.send({
@@ -216,8 +232,8 @@ exports.saveAddress = async (req, res, next) => {
       message: "Add address Successfully",
     });
   } catch (error) {
-    next(error);
-    res.status(500).json({ message: "Failed to Add Address" });
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -251,10 +267,6 @@ exports.saveUserOrder = async (req, res, next) => {
         select: { quantity: true, title: true }, // Product
       });
 
-      // console.log('User need:',item)
-      // console.log('Product in Stock:',product)
-
-      // CHECK \ sold-out \ not have
       if (!product || item.count > product.quantity) {
         return res.status(400).send({
           message: `Unable to complete the transaction because 
@@ -267,7 +279,6 @@ exports.saveUserOrder = async (req, res, next) => {
     const CreateOrder = await prisma.order.create({
       data: {
         products: {
-          // Create - when pass CHECK
           create: UserCart.products.map((item) => ({
             productId: item.productId,
             count: item.count,
@@ -279,7 +290,7 @@ exports.saveUserOrder = async (req, res, next) => {
         stripePaymentId: "",
         amount: Number(UserCart.cartTotal),
         status: "Not Process",
-        currentcy: "THB",
+        currency: "THB",
       },
     });
     // Update Product after Create Order
@@ -301,7 +312,7 @@ exports.saveUserOrder = async (req, res, next) => {
     });
     res.json({ ok: true, CreateOrder });
   } catch (error) {
-    next(error);
+    console.log(error);
     res.status(500).json({ message: "Failed to Add User Order" });
   }
 };
@@ -328,7 +339,7 @@ exports.getUserOrder = async (req, res, next) => {
       message: "List User Order Successfully",
     });
   } catch (error) {
-    next(error);
+    console.log(error);
     res.status(500).json({ message: "Failed to User Order" });
   }
 };
