@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
 import { addressUserCart, listUserCart } from "../api/user";
 import Swal from "sweetalert2";
+import Payment from "./user/payment";
 
 const CheckOut = () => {
   const token = useEcomStore((state) => state.token);
@@ -12,8 +13,8 @@ const CheckOut = () => {
   const [products, setProducts] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
+  const [netTotal, setNetTotal] = useState(0);
   const [vat, setVat] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   // state address
   const [address, setAddress] = useState({
     address: "",
@@ -35,6 +36,7 @@ const CheckOut = () => {
       setCartTotal(res.data.cartTotal || 0);
       setShipping(res.data.shipping || 0);
       setVat(res.data.vat || 0);
+      setNetTotal(res.data.netTotal || 0);
     } catch (error) {
       console.log(error);
     }
@@ -47,7 +49,7 @@ const CheckOut = () => {
     });
   };
   // Handle Confirm Order
-  const hldConfirmOrder = async () => {
+  const handleSaveAddress = async () => {
     // validate
     if (
       !address.address ||
@@ -59,24 +61,15 @@ const CheckOut = () => {
         title: "Please fill in all address fields",
         icon: "warning",
       });
+      return false;
     }
-    setIsLoading(true);
 
     try {
-      // Save Address
       await addressUserCart(token, address);
-
-      // 📦 3. Prepare Payload
-      // const payload = {
-      //   address: `${address.name} (${address.phoneNumber}) ${address.address}`,
-      //   amount: Math.round((cartTotal + vat + shipping) * 100),
-      //   currency: "thb",
-      //   status: "pending",
-      //   stripePaymentId: "",
-      // };
-      // navigate("/user/payment");
+      return true; // true - record
     } catch (error) {
       console.log(error);
+      return false;
     }
   };
 
@@ -150,14 +143,20 @@ const CheckOut = () => {
                   />
                 </div>
               </div>
+              {/* Payment Stripe */}
+              <div className="mt-5">
+                <Payment
+                  address={address}
+                  handleSaveAddress={handleSaveAddress}
+                />
+              </div>
             </div>
-            {/* Payment Stripe */}
           </div>
 
           {/* --- RIGHT COLUMN: Order Summary (Ultra Minimal - Text Only) --- */}
           <div className="lg:col-span-1">
-            <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-6">
-              <h2 className="text-xl font-bold text-slate-800 mb-8 tracking-tight">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+              <h2 className="text-xl font-bold text-slate-800 mb-6">
                 Order Summary
               </h2>
 
@@ -230,15 +229,16 @@ const CheckOut = () => {
                 </div>
                 <span className="text-3xl font-black text-indigo-700 tracking-tight font-mono leading-none">
                   ฿
-                  {(cartTotal * 1.07).toLocaleString(undefined, {
+                  {netTotal.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                   })}
                 </span>
               </div>
-
-              {/* 4. Action Button */}
+              <p className="text-center text-xs text-slate-400 mt-4">
+                By confirming, you agree to our Terms & Conditions.
+              </p>
               {/* Action Button */}
-              <button
+              {/* <button
                 onClick={hldConfirmOrder}
                 disabled={isLoading}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -248,11 +248,7 @@ const CheckOut = () => {
                 ) : (
                   "Confirm Payment"
                 )}
-              </button>
-
-              <p className="text-center text-xs text-slate-400 mt-4">
-                By confirming, you agree to our Terms & Conditions.
-              </p>
+              </button> */}
             </div>
           </div>
         </div>

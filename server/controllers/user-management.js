@@ -241,11 +241,13 @@ exports.saveAddress = async (req, res, next) => {
 exports.saveUserOrder = async (req, res, next) => {
   try {
     // code
-    const { id } = req.user;
+    // Stripe
+    const { id, amount, currency, status } = req.body.paymentIntent;
+    const amountTHB = Number(amount) / 100;
     const UserCart = await prisma.cart.findFirst({
       where: {
         orderedBy: {
-          id: Number(id),
+          id: Number(req.user.id),
         },
       },
       include: {
@@ -260,21 +262,21 @@ exports.saveUserOrder = async (req, res, next) => {
       });
     }
     // Check Quantity in Stock
-    for (const item of UserCart.products) {
-      // [ .findUnique ]
-      const product = await prisma.product.findUnique({
-        where: { id: item.productId }, // item.productId - User's id in Cart
-        select: { quantity: true, title: true }, // Product
-      });
+    // for (const item of UserCart.products) {
+    //   // [ .findUnique ]
+    //   const product = await prisma.product.findUnique({
+    //     where: { id: item.productId }, // item.productId - User's id in Cart
+    //     select: { quantity: true, title: true }, // Product
+    //   });
 
-      if (!product || item.count > product.quantity) {
-        return res.status(400).send({
-          message: `Unable to complete the transaction because 
-                    the product of ${product?.title || "product"} 
-                    is out of stock.`,
-        });
-      }
-    }
+    //   if (!product || item.count > product.quantity) {
+    //     return res.status(400).send({
+    //       message: `Unable to complete the transaction because
+    //                 the product of ${product?.title || "product"}
+    //                 is out of stock.`,
+    //     });
+    //   }
+    // }
     // Create New Order
     const CreateOrder = await prisma.order.create({
       data: {
@@ -285,12 +287,12 @@ exports.saveUserOrder = async (req, res, next) => {
             price: item.price,
           })),
         },
-        orderedBy: { connect: { id: Number(id) } },
+        orderedBy: { connect: { id: Number(req.user.id) } },
         cartTotal: UserCart.cartTotal,
-        stripePaymentId: "",
-        amount: Number(UserCart.cartTotal),
-        status: "Not Process",
-        currency: "THB",
+        stripePaymentId: id,
+        amount: amountTHB,
+        status: status,
+        currency: currency,
       },
     });
     // Update Product after Create Order
@@ -308,7 +310,7 @@ exports.saveUserOrder = async (req, res, next) => {
     );
     // Cart Order - delete
     await prisma.cart.deleteMany({
-      where: { orderedById: Number(id) },
+      where: { orderedById: Number(req.user.id) },
     });
     res.json({ ok: true, CreateOrder });
   } catch (error) {

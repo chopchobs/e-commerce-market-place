@@ -66,9 +66,10 @@ export const addressUserCart = async (token, data) => {
     },
   });
 };
-// Post - Create User's Orders
-export const createUserOrder = async (token, cart) => {
-  return await axios.post("http://localhost:5001/api/user/order", cart, {
+// ------ Order ------
+// Post - Save User's Orders
+export const saveUserOrder = async (token, payload) => {
+  return await axios.post("http://localhost:5001/api/user/order", payload, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
