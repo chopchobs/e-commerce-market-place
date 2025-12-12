@@ -73,56 +73,86 @@ exports.AddChangeRole = async (req, res, next) => {
 // Cart Add - (.post)
 exports.createUserCart = async (req, res, next) => {
   try {
-    // code
+    // code , Not use data price from pathname url
     const { cart } = req.body;
     const { id } = req.user;
-    // Check User - Id
+    // Validate User
     const user = await prisma.user.findFirst({
       where: {
         id: Number(id),
       },
     });
-    // Delete All-Cart by User
-    await prisma.productOnCart.deleteMany({
-      where: {
-        cart: {
-          orderedById: user.id,
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    //  Prepare Data & Validate Stock
+    let productsForCreate = [];
+    let cartTotal = 0;
+    // Validation Loop
+    for (const item of cart) {
+      const productFromDb = await prisma.product.findUnique({
+        where: { id: item.id },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          quantity: true,
         },
-      },
+      });
+    }
+    // Check Product
+    if (!productFromDb) {
+      return res.status(404).json({
+        message: `Product ID ${item.id} not found`,
+      });
+    }
+    // Check Stock ( จำนวนที่ขอ > จำนวนที่มี )
+    if (item.count > productFromDb.quantity) {
+      return res.status(400).json({
+        message: `Sorry, product '${productFromDb.title}' is out of stock (Available: ${productFromDb.quantity})`,
+      });
+    }
+    // Prepare data for record
+    productsForCreate.push({
+      productId: productFromDb.id,
+      count: item.count,
+      price: productFromDb.price, // 🛡️ Security Point: ใช้ราคาจริงจาก DB
     });
-    //  Delete Order
+    x;
+    // Calculate
+    cartTotal += productFromDb.price * item.count;
+
+    // Reset Strategy
+    // .productOnCart.deleteMany (...)
+    // .cart.deleteMany (...)
+    // .cart.create (...)
+
+    // Clear Old product on Cart
+    await prisma.productOnCart.deleteMany({
+      where: { cart: { orderedById: user.id } },
+    });
+    //  Delete old cart
     await prisma.cart.deleteMany({
       where: { orderedById: user.id },
     });
-    // Prepare Product
-    let products = cart.map((item) => ({
-      productId: item.id,
-      count: item.count,
-      price: item.price,
-    }));
-    // Calculate
-    let cartTotal = products.reduce(
-      (sum, item) => sum + item.price * item.count,
-      0
-    );
-    // Create Cart
-    const CreateCart = await prisma.cart.create({
+
+    // Create  newCart
+    const newCart = await prisma.cart.create({
       data: {
         products: {
-          create: products,
+          create: productsForCreate, // data Validate , prepare
         },
         cartTotal: cartTotal,
         orderedById: user.id,
       },
     });
     res.status(200).json({
-      message: "Add Product in Cart Successfully",
+      message: "Cart updated successfully",
+      cartTotal: cartTotal,
+      data: newCart,
     });
   } catch (error) {
-    next(error);
-    res.status(500).json({
-      message: "Failed to List User Cart",
-    });
+    console.log(error);
+    res.status(500).json({ message: "Server Error: Cannot create cart" });
   }
 };
 // Cart List - (.get)
@@ -261,6 +291,7 @@ exports.saveUserOrder = async (req, res, next) => {
         message: "Cart is Empty",
       });
     }
+
     // Check Quantity in Stock
     // for (const item of UserCart.products) {
     //   // [ .findUnique ]
@@ -277,6 +308,7 @@ exports.saveUserOrder = async (req, res, next) => {
     //     });
     //   }
     // }
+
     // Create New Order
     const CreateOrder = await prisma.order.create({
       data: {
