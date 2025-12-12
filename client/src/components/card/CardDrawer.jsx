@@ -180,7 +180,7 @@ const CartDrawer = () => {
               onClick={hldSaveCartCheckOut}
               className="w-full flex items-center justify-center bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95"
             >
-              View Full Cart
+              Proceed to Checkout
             </button>
           </div>
         )}
