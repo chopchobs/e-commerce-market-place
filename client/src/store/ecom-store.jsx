@@ -8,7 +8,9 @@ import {
   SearchProducts,
 } from "../api/createProducts";
 import _ from "lodash";
+const API_URL = import.meta.env.VITE_API_URL; // API URL from .env file
 
+// Initial State
 const initialState = {
   user: null,
   token: null,
@@ -18,7 +20,7 @@ const initialState = {
   readProduct: null,
   isOpen: false,
 };
-
+// Ecom Store
 const ecomStore = (set, get) => ({
   ...initialState,
   // --- Cart Action ---
@@ -55,7 +57,7 @@ const ecomStore = (set, get) => ({
     // 1. find product that on cart or not
     const index = _.findIndex(carts, { id: item.id });
     console.log("index", index);
-    // 🟢A have product - add plus (update count)
+    // 🟢 A have product - add plus (update count)
     if (index !== -1) {
       // New Array for safe
       const newCarts = [...carts];
@@ -122,7 +124,7 @@ const ecomStore = (set, get) => ({
   // --------------------  System --------------------
   // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
-    const res = await axios.post("http://localhost:5001/api/login", Data);
+    const res = await axios.post(`${API_URL}/api/login`, Data);
     console.log(res);
     // user , token 🌎
     set({

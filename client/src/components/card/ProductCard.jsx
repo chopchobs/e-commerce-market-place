@@ -1,7 +1,7 @@
 import { ShoppingCart, Heart } from "lucide-react";
 import NewProduct from "./NewProdcut";
 import useEcomStore from "../../store/ecom-store";
-
+import numberFormat from "../utility/number";
 const ProductCard = ({ item }) => {
   const actionAddToCart = useEcomStore((state) => state.actionAddToCart);
   return (
@@ -46,7 +46,7 @@ const ProductCard = ({ item }) => {
         </h3>
         <div className="flex items-center justify-between mt-2">
           <span className="font-bold text-slate-900">
-            ฿{item.price.toLocaleString()}
+            ฿{numberFormat(item.price)} THB
           </span>
           <div className="flex gap-1 text-yellow-400 text-xs">★★★★☆ (12)</div>
         </div>

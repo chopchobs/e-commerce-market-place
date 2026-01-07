@@ -1,9 +1,9 @@
 import axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 // API Calls for Products - CRUD Operations 📦
 // Product - Create
 export const AddProduct = async (token, data) => {
-  return await axios.post("http://localhost:5001/api/product", data, {
+  return await axios.post(`${API_URL}/api/product`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -11,11 +11,11 @@ export const AddProduct = async (token, data) => {
 };
 // Product (Public) - Read Count
 export const CountProducts = async (count = 20) => {
-  return await axios.get("http://localhost:5001/api/products/" + count);
+  return await axios.get(`${API_URL}/api/products/` + count);
 };
 // Product - Read ID
 export const ReadProduct = async (token, id) => {
-  return await axios.get("http://localhost:5001/api/product/" + id, {
+  return await axios.get(`${API_URL}/api/product/` + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -23,7 +23,7 @@ export const ReadProduct = async (token, id) => {
 };
 // Product - Update
 export const UpdateProducts = async (token, id, form) => {
-  return await axios.put("http://localhost:5001/api/product/" + id, form, {
+  return await axios.put(`${API_URL}/api/product/` + id, form, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -31,7 +31,7 @@ export const UpdateProducts = async (token, id, form) => {
 };
 // Product - Delete
 export const RemoveProducts = async (token, id) => {
-  return await axios.delete("http://localhost:5001/api/product/" + id, {
+  return await axios.delete(`${API_URL}/api/product/` + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -47,14 +47,14 @@ export const FilterProducts = async (token, data) => {
 };
 // Product - Search (Public)
 export const SearchProducts = async (arg) => {
-  return await axios.post("http://localhost:5001/api/search/filter", arg);
+  return await axios.post(`${API_URL}/api/search/filter`, arg);
 };
 
 // IMAGE API - Operations(Upload, Delete)🖼️ ✅,⛔️
 // Image - 1.Upload
 export const UploadImages = async (token, data) => {
   return await axios.post(
-    "http://localhost:5001/api/image",
+    `${API_URL}/api/image`,
     { images: data },
     {
       headers: {
@@ -66,7 +66,7 @@ export const UploadImages = async (token, data) => {
 // Image - 2.Delete
 export const RemoveImage = async (token, public_id) => {
   return await axios.post(
-    "http://localhost:5001/api/removeImage",
+    `${API_URL}/api/removeImage`,
     { public_id },
     {
       headers: {

@@ -1,8 +1,9 @@
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import useEcomStore from "../../store/ecom-store";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { createUserCart } from "../../api/user";
+import { numberFormat } from "../utility/number";
 const CartDrawer = () => {
   // zustand
   const user = useEcomStore((state) => state.user);
@@ -139,7 +140,7 @@ const CartDrawer = () => {
 
                     {/* Price */}
                     <span className="font-bold text-indigo-600 text-sm">
-                      ฿{(item.price * item.count).toLocaleString()}
+                      ฿{numberFormat(item.price * item.count)}
                     </span>
                   </div>
                 </div>
@@ -168,7 +169,7 @@ const CartDrawer = () => {
             <div className="flex justify-between items-center mb-4">
               <span className="text-slate-600 font-medium">Subtotal</span>
               <span className="text-xl font-extrabold text-slate-900">
-                ฿{actionTotalPrice().toLocaleString()}
+                ฿{numberFormat(actionTotalPrice())}
               </span>
             </div>
 

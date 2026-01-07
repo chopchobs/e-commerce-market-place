@@ -3,7 +3,7 @@ import useEcomStore from "../../store/ecom-store";
 import { useEffect, useState } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
-
+import numberFormat from "../utility/number";
 const SearchCard = () => {
   //zustand store - Product 🌎
   // Products ( public )
@@ -152,11 +152,11 @@ const SearchCard = () => {
         {/* Price Display Boxes */}
         <div className="flex justify-between items-center mt-4 text-sm">
           <div className="border border-slate-200 bg-slate-50 rounded-md px-3 py-1.5 text-slate-600 font-medium w-24 text-center">
-            ฿{price[0].toLocaleString()}
+            ฿{numberFormat(price[0])}
           </div>
           <span className="text-slate-400 font-light">-</span>
           <div className="border border-slate-200 bg-slate-50 rounded-md px-3 py-1.5 text-slate-600 font-medium w-24 text-center">
-            ฿{price[1].toLocaleString()}
+            ฿{numberFormat(price[1])}
           </div>
         </div>
       </div>

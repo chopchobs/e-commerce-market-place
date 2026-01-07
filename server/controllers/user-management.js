@@ -82,12 +82,14 @@ exports.createUserCart = async (req, res, next) => {
         id: Number(id),
       },
     });
+    // Validate User
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    //  Prepare Data & Validate Stock
+    // Prepare Data for Create Cart
     let productsForCreate = [];
     let cartTotal = 0;
-    // Validation Loop
+
+    // Validate Product & Stock
     for (const item of cart) {
       const productFromDb = await prisma.product.findUnique({
         where: { id: item.id },
@@ -98,48 +100,41 @@ exports.createUserCart = async (req, res, next) => {
           quantity: true,
         },
       });
-    }
-    // Check Product
-    if (!productFromDb) {
-      return res.status(404).json({
-        message: `Product ID ${item.id} not found`,
+      // check Product Found
+      if (!productFromDb) {
+        return res.status(404).json({
+          message: `Product ID ${item.id} not found`,
+        });
+      }
+      // Check Stock ( จำนวนที่ขอ > จำนวนที่มี )
+      if (item.count > productFromDb.quantity) {
+        return res.status(400).json({
+          message: `Sorry, product '${productFromDb.title}' is out of stock (Available: ${productFromDb.quantity})`,
+        });
+      }
+      // Prepare data for record
+      productsForCreate.push({
+        productId: productFromDb.id,
+        count: item.count,
+        price: productFromDb.price, // 🛡️ Security Point: ใช้ราคาจริงจาก DB
       });
+      // Calculate
+      cartTotal += productFromDb.price * item.count;
     }
-    // Check Stock ( จำนวนที่ขอ > จำนวนที่มี )
-    if (item.count > productFromDb.quantity) {
-      return res.status(400).json({
-        message: `Sorry, product '${productFromDb.title}' is out of stock (Available: ${productFromDb.quantity})`,
-      });
-    }
-    // Prepare data for record
-    productsForCreate.push({
-      productId: productFromDb.id,
-      count: item.count,
-      price: productFromDb.price, // 🛡️ Security Point: ใช้ราคาจริงจาก DB
-    });
-    x;
-    // Calculate
-    cartTotal += productFromDb.price * item.count;
-
-    // Reset Strategy
-    // .productOnCart.deleteMany (...)
-    // .cart.deleteMany (...)
-    // .cart.create (...)
-
-    // Clear Old product on Cart
+    // Delete old data
     await prisma.productOnCart.deleteMany({
       where: { cart: { orderedById: user.id } },
     });
-    //  Delete old cart
+    // Delete old cart
     await prisma.cart.deleteMany({
       where: { orderedById: user.id },
     });
 
-    // Create  newCart
+    // Create New Cart
     const newCart = await prisma.cart.create({
       data: {
         products: {
-          create: productsForCreate, // data Validate , prepare
+          create: productsForCreate,
         },
         cartTotal: cartTotal,
         orderedById: user.id,
@@ -291,23 +286,6 @@ exports.saveUserOrder = async (req, res, next) => {
         message: "Cart is Empty",
       });
     }
-
-    // Check Quantity in Stock
-    // for (const item of UserCart.products) {
-    //   // [ .findUnique ]
-    //   const product = await prisma.product.findUnique({
-    //     where: { id: item.productId }, // item.productId - User's id in Cart
-    //     select: { quantity: true, title: true }, // Product
-    //   });
-
-    //   if (!product || item.count > product.quantity) {
-    //     return res.status(400).send({
-    //       message: `Unable to complete the transaction because
-    //                 the product of ${product?.title || "product"}
-    //                 is out of stock.`,
-    //     });
-    //   }
-    // }
 
     // Create New Order
     const CreateOrder = await prisma.order.create({

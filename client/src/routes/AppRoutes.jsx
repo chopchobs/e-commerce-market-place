@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"; // insta
 import Home from "../pages/Home";
 import Shop from "../pages/Shop";
 import About from "../pages/About";
-import History from "../pages/History";
 import CheckOut from "../pages/CheckOut";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -19,10 +18,12 @@ import EditProduct from "../pages/admin/EditProduct";
 import Category from "../pages/admin/Category";
 import Contact from "../pages/Contact";
 import Payment from "../pages/user/payment";
+import History from "../pages/user/History";
+import ManageOrders from "../components/admin/ManageOrders";
 
 const router = createBrowserRouter([
   {
-    // user
+    // general 🎃
     path: "/",
     element: <Layout />,
     children: [
@@ -30,14 +31,13 @@ const router = createBrowserRouter([
       { path: "shop", element: <Shop /> },
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
-      { path: "history", element: <History /> },
       { path: "checkout", element: <CheckOut /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
     ],
   },
   {
-    // admin -  Protect ☕️
+    // admin  ☕️
     path: "/admin",
     element: <ProtectRouteAdmin element={<LayoutAdmin />} />,
     children: [
@@ -46,15 +46,17 @@ const router = createBrowserRouter([
       { path: "product", element: <Product /> },
       { path: "product/:id", element: <EditProduct /> },
       { path: "manage", element: <Manage /> },
+      { path: "orders", element: <ManageOrders /> },
     ],
   },
   {
-    // User -  Protect 🐽
+    // User  🐽
     path: "/user",
     element: <ProtectRouteUser element={<LayoutUser />} />,
     children: [
       { index: true, element: <HomeUser /> },
       { path: "payment", element: <Payment /> },
+      { path: "history", element: <History /> },
     ],
   },
 ]);

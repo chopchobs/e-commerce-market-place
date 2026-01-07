@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import useEcomStore from "../../store/ecom-store";
-import { toast } from "sonner";
 import {
   Save,
   Image as ImageIcon,

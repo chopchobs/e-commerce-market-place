@@ -8,15 +8,22 @@ exports.Payment = async (req, res) => {
     const cart = await prisma.cart.findFirst({
       where: { orderedById: req.user.id },
     });
-    const amountTHB = Math.round(cart.cartTotal * 100) * 1.07;
+    // validate cart
+    if (!cart) {
+      return res.status(400).json({ message: "Cart not found" });
+    }
+    // calculate amount in THB with 7% VAT
+    const amountTHB = Math.round(cart.cartTotal * 100 * 1.07);
+    // create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountTHB,
       currency: "thb",
-
       automatic_payment_methods: {
         enabled: true,
       },
     });
+    // const stripeId = paymentIntent.id;
+    // console.log("Stripe PaymentIntent ID:", stripeId);
 
     res.send({
       clientSecret: paymentIntent.client_secret,
