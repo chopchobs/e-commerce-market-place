@@ -1,7 +1,7 @@
 const prisma = require("../config/prisma");
 
 // route.put('/user/order');
-exports.EditUserOrder = async (req, res, next) => {
+exports.changOrderStatusAdmin = async (req, res, next) => {
   try {
     // code
     const { orderId, orderStatus } = req.body;
@@ -14,7 +14,6 @@ exports.EditUserOrder = async (req, res, next) => {
       message: "Edit User Order Successfully",
     });
   } catch (error) {
-    next(error);
     res.status(500).json({
       message: "Failed to Edit User Order",
     });
@@ -49,9 +48,25 @@ exports.ListAdminOrder = async (req, res, next) => {
       message: "List Admin Order Successfully",
     });
   } catch (error) {
-    next(error);
     res.status(500).json({
       message: "Failed to List Admin Order",
+    });
+  }
+};
+// route.delete('/admin/orders-delete');
+exports.deleteOrderAdmin = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedOrder = await prisma.order.delete({
+      where: { id: Number(id) },
+    });
+    res.status(200).send({
+      deletedOrder,
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete order",
     });
   }
 };

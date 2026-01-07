@@ -1,11 +1,11 @@
-import React, { useState, useEffect, use } from "react";
+import { useState, useEffect, use } from "react";
 import { MapPin, ChevronLeft, Wallet, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
 import { addressUserCart, listUserCart } from "../api/user";
 import Swal from "sweetalert2";
 import Payment from "./user/payment";
-
+import numberFormat from "../components/utility/number";
 const CheckOut = () => {
   const token = useEcomStore((state) => state.token);
   const navigate = useNavigate();
@@ -176,7 +176,7 @@ const CheckOut = () => {
                         <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">
                           x{item.count}
                         </span>
-                        <span> ฿{item.price.toLocaleString()}</span>
+                        <span> ฿{numberFormat(item.price)}</span>
                       </div>
                     </div>
 
@@ -190,27 +190,24 @@ const CheckOut = () => {
 
               {/* Divider (Solid thin) */}
               <div className="border-t border-slate-100 my-6"></div>
-
               {/* 2. Calculation Details */}
               <div className="space-y-3 text-sm font-medium">
+                {/* Subtotal */}
                 <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
                   <span className="text-slate-700">
-                    ฿{cartTotal.toLocaleString()}
+                    ฿{numberFormat(cartTotal)}
                   </span>
                 </div>
+                {/* Shipping */}
                 <div className="flex justify-between text-slate-500">
                   <span>Shipping</span>
                   <span className="text-emerald-600">{shipping}</span>
                 </div>
+                {/* VAT */}
                 <div className="flex justify-between text-slate-500">
                   <span>VAT (7%)</span>
-                  <span className="text-slate-700">
-                    ฿
-                    {vat.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
+                  <span className="text-slate-700">฿{numberFormat(vat)}</span>
                 </div>
               </div>
 
@@ -227,11 +224,9 @@ const CheckOut = () => {
                     THB (Inc. VAT)
                   </span>
                 </div>
+                {/* Total */}
                 <span className="text-3xl font-black text-indigo-700 tracking-tight font-mono leading-none">
-                  ฿
-                  {netTotal.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
+                  ฿{numberFormat(netTotal)}
                 </span>
               </div>
               <p className="text-center text-xs text-slate-400 mt-4">

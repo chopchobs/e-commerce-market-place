@@ -1,9 +1,19 @@
 const express = require("express");
-const { EditUserOrder, ListAdminOrder } = require("../controllers/admin");
+const {
+  ListAdminOrder,
+  changOrderStatusAdmin,
+  deleteOrderAdmin,
+} = require("../controllers/admin");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 const route = express();
 
-route.put("/user/order", authCheck, adminCheck, EditUserOrder);
+route.put("/admin/order-status", authCheck, adminCheck, changOrderStatusAdmin);
 route.get("/admin/orders", authCheck, adminCheck, ListAdminOrder);
+route.delete(
+  "/admin/order-delete/:id",
+  authCheck,
+  adminCheck,
+  deleteOrderAdmin
+);
 
 module.exports = route;

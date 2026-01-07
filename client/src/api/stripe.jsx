@@ -1,8 +1,8 @@
 import axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export const payment = async (token) =>
   await axios.post(
-    "http://localhost:5001/api/user/create-payment-intent",
+    `${API_URL}/api/user/create-payment-intent`,
     {},
     {
       headers: {

@@ -1,9 +1,10 @@
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 // API Calls for Authentication - Current User/Admin 🔑
 // User - token 🔑
 export const CurrentUser = async (token) =>
   await axios.post(
-    "http://localhost:5001/api/current-user",
+    `${API_URL}/api/current-user`,
     {},
     {
       headers: {
@@ -14,7 +15,7 @@ export const CurrentUser = async (token) =>
 // Admin - token 🔑
 export const CurrentAdmin = async (token) => {
   return await axios.post(
-    "http://localhost:5001/api/current-admin",
+    `${API_URL}/api/current-admin`,
     {},
     {
       headers: {

@@ -28,7 +28,7 @@ const AdminSidebar = () => {
 
   return (
     <div className="h-screen w-72 bg-[#0B1120] border-r border-slate-800/60 flex flex-col shadow-2xl relative overflow-hidden">
-      {/* Background Decor (แสงฟุ้ง) */}
+      {/* Background Decor  */}
       <div className="absolute top-0 left-0 w-full h-64 bg-indigo-600/10 blur-[80px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-48 h-48 bg-purple-600/5 blur-[60px] pointer-events-none" />
 

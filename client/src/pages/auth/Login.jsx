@@ -47,7 +47,7 @@ const Login = () => {
   };
 
   const hldOnChangeInput = async (e) => {
-    console.log(e.target.name, e.target.value);
+    // console.log(e.target.name, e.target.value);
     setData({
       ...Data,
       // key // value

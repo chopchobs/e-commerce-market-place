@@ -1,9 +1,10 @@
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 // API Calls for Categories - CRUD Operations 📦
 // Category - Create
 export const addCategory = async (token, name) => {
   // API Call to create category
-  return await axios.post("http://localhost:5001/api/category", name, {
+  return await axios.post(`${API_URL}/api/category`, name, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -11,11 +12,11 @@ export const addCategory = async (token, name) => {
 };
 // Category (Public) - List
 export const ListCategory = async () => {
-  return await axios.get("http://localhost:5001/api/categories");
+  return await axios.get(`${API_URL}/api/categories`);
 };
 // Category - Update
 export const updateCategory = async (token, id, name) => {
-  return await axios.put("http://localhost:5001/api/category/" + id, name, {
+  return await axios.put(`${API_URL}/api/category/` + id, name, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -23,7 +24,7 @@ export const updateCategory = async (token, id, name) => {
 };
 // Category - Remove
 export const RemoveCategory = async (token, id) => {
-  return await axios.delete("http://localhost:5001/api/category/" + id, {
+  return await axios.delete(`${API_URL}/api/category/` + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

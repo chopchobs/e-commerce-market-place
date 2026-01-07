@@ -11,7 +11,7 @@ import {
 } from "lucide-react"; // เพิ่ม X icon
 import Resizer from "react-image-file-resizer";
 import Swal from "sweetalert2";
-
+import numberFormat from "../utility/number";
 // API Import
 import {
   AddProduct,
@@ -450,7 +450,7 @@ const FormProducts = () => {
                       {item.category?.name || "-"}
                     </td>
                     <td className="px-6 py-4 text-right font-mono text-indigo-600 font-medium">
-                      {formatCurrency(item.price)}
+                      ฿{numberFormat(item.price)}THB
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span
