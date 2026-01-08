@@ -2,6 +2,33 @@ import axios from "axios";
 // Admin API Calls - Orders Management 📋
 const API_URL = import.meta.env.VITE_API_URL;
 
+// --- User Management ---
+// GET - Users
+export const listUsers = async (token) => {
+  return await axios.get(`${API_URL}/api/admin/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+// Post - Change Status (Enable/Disable)
+export const changeStatusUser = async (token, data) => {
+  return await axios.post(`${API_URL}/api/admin/change-status`, token, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+// Post - Change Role (Admin/User)
+export const changeRoleUser = async (token, data) => {
+  return await axios.post(`${API_URL}/api/admin/change-role`, token, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// --- Orders Management ---
 // Put(edit) - Change Order Status (Admin)
 export const updateOrderStatus = async (token, orderId, orderStatus) => {
   return await axios.put(

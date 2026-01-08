@@ -1,5 +1,78 @@
 const prisma = require("../config/prisma");
 
+// --- User Management ---
+// router.get('/users')
+exports.getListUsersAdmin = async (req, res, next) => {
+  try {
+    // code
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        enabled: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    res.status(200).json({ users });
+  } catch (error) {
+    next(error);
+    res.status(500).json({ message: "Failed to List User" });
+  }
+};
+// router.post('Change - Enabled') login
+exports.AddChangeStatus = async (req, res, next) => {
+  try {
+    // code
+    const { id, enabled } = req.body;
+    const UpdateStatusEnabled = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { enabled: enabled },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        enabled: true,
+        address: true,
+      },
+    });
+    res.send({
+      UpdateStatusEnabled,
+      message: "Add Change Status Successfully",
+    });
+  } catch (error) {
+    next(error);
+    res.status(500).send({ message: "Failed to Add Change Status" });
+  }
+};
+// router.post('Change - Role') admin or user
+exports.AddChangeRole = async (req, res, next) => {
+  try {
+    // code
+    const { id, role } = req.body;
+    const UpdateStatusRole = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { role: role },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        enabled: true,
+        address: true,
+      },
+    });
+    res.status(200).send({
+      UpdateStatusRole,
+      message: "Add Change Role Successfully",
+    });
+  } catch (error) {
+    next(error);
+    res.status(500).json({ message: "Failed to Add Change Role" });
+  }
+};
+
+// ---- Order ----
 // route.put('/user/order');
 exports.changOrderStatusAdmin = async (req, res, next) => {
   try {
@@ -19,7 +92,6 @@ exports.changOrderStatusAdmin = async (req, res, next) => {
     });
   }
 };
-
 // route.get('/admin/orders');
 exports.ListAdminOrder = async (req, res, next) => {
   try {
@@ -35,6 +107,7 @@ exports.ListAdminOrder = async (req, res, next) => {
           select: {
             id: true,
             email: true,
+            name: true,
             role: true,
             enabled: true,
             address: true,

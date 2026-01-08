@@ -1,9 +1,9 @@
-import FormManage from "../../components/admin/FormManage";
+import TableUser from "../../components/admin/TableUser";
 
 const Manage = () => {
   return (
     <div>
-      <FormManage />
+      <TableUser />
     </div>
   );
 };

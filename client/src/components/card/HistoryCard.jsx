@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import numberFormat from "../utility/number";
+import date from "../utility/date";
 // loop orders
 // loop products in orders
 
@@ -80,9 +81,7 @@ const HistoryCard = () => {
                   </h3>
                   <p className="text-sm text-slate-500 mt-1">
                     Placed on {/* Date on product */}
-                    {order.updatedAt
-                      ? new Date(order.updatedAt).toLocaleDateString("th-TH")
-                      : "Date N/A"}
+                    {date(order.updatedAt)}
                   </p>
                 </div>
                 {/* Status Badge */}

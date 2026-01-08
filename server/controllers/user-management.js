@@ -1,75 +1,5 @@
 const prisma = require("../config/prisma");
-
-// router.get('/users')
-exports.ListUsers = async (req, res, next) => {
-  try {
-    // code
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        enabled: true,
-        address: true,
-      },
-    });
-    res.status(200).json({ users });
-  } catch (error) {
-    next(error);
-    res.status(500).json({ message: "Failed to List User" });
-  }
-};
-// router.post('Change - Enabled') login
-exports.AddChangeStatus = async (req, res, next) => {
-  try {
-    // code
-    const { id, enabled } = req.body;
-    const UpdateStatusEnabled = await prisma.user.update({
-      where: { id: Number(id) },
-      data: { enabled: enabled },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        enabled: true,
-        address: true,
-      },
-    });
-    res.send({
-      UpdateStatusEnabled,
-      message: "Add Change Status Successfully",
-    });
-  } catch (error) {
-    next(error);
-    res.status(500).send({ message: "Failed to Add Change Status" });
-  }
-};
-// router.post('Change - Role') admin or user
-exports.AddChangeRole = async (req, res, next) => {
-  try {
-    // code
-    const { id, role } = req.body;
-    const UpdateStatusRole = await prisma.user.update({
-      where: { id: Number(id) },
-      data: { role: role },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        enabled: true,
-        address: true,
-      },
-    });
-    res.status(200).send({
-      UpdateStatusRole,
-      message: "Add Change Role Successfully",
-    });
-  } catch (error) {
-    next(error);
-    res.status(500).json({ message: "Failed to Add Change Role" });
-  }
-};
-
+//--- Cart Management---
 // Cart Add - (.post)
 exports.createUserCart = async (req, res, next) => {
   try {
@@ -236,6 +166,7 @@ exports.emptyUserCart = async (req, res, next) => {
   }
 };
 
+// --- Address Management ---
 // Address Add - (.post)
 exports.saveAddress = async (req, res, next) => {
   try {
@@ -262,6 +193,7 @@ exports.saveAddress = async (req, res, next) => {
   }
 };
 
+// --- Order Management ---
 // Order Add - (.post)
 exports.saveUserOrder = async (req, res, next) => {
   try {

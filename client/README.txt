@@ -12,14 +12,14 @@ npm install lucide-react
 npm install sweetalert2
 npm i rc-slider
 npm i lodash
+npm npm i numeral
+npm install moment
 
 npm install @radix-ui/themes
 npm install @react-oauth/google@latest
 
 npm i react-image-file-resizer
 npm i react-icons
-npm i numeral
-npm install moment
 
 npm install react-hook-form zod @hookform/resolvers zxcvbn
 

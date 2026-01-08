@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  ListUsers,
   AddChangeStatus,
   AddChangeRole,
   saveAddress,
@@ -10,20 +9,17 @@ const {
   createUserCart,
   listUserCart,
 } = require("../controllers/user-management");
-const router = express();
-const { authCheck, adminCheck } = require("../middleware/authCheck");
+const route = express();
+const { authCheck } = require("../middleware/authCheck");
 
-router.get("/users", authCheck, adminCheck, ListUsers);
-router.post("/change-status", authCheck, adminCheck, AddChangeStatus);
-router.post("/change-role", authCheck, adminCheck, AddChangeRole);
 // --- Cart ---
-router.post("/user/cart", authCheck, createUserCart);
-router.get("/user/cart", authCheck, listUserCart);
-router.delete("/user/cart", authCheck, emptyUserCart);
+route.post("/user/cart", authCheck, createUserCart);
+route.get("/user/cart", authCheck, listUserCart);
+route.delete("/user/cart", authCheck, emptyUserCart);
 // --- Address ---
-router.post("/user/address", authCheck, saveAddress);
+route.post("/user/address", authCheck, saveAddress);
 // --- Order ---
-router.post("/user/order", authCheck, saveUserOrder);
-router.get("/user/order", authCheck, getUserOrder);
+route.post("/user/order", authCheck, saveUserOrder);
+route.get("/user/order", authCheck, getUserOrder);
 
-module.exports = router;
+module.exports = route;
