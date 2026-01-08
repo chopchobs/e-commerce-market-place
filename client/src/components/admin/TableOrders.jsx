@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { numberFormat } from "../utility/number";
+import date from "../utility/date";
+import PaymentBadge from "./PaymentBadge";
 
 const TableOrders = () => {
   const token = useEcomStore((state) => state.token);
@@ -27,7 +29,7 @@ const TableOrders = () => {
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  // ฟังก์ชันเปิด Modal
+  // function to open modal and set selected order
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
     setShowModal(true);
@@ -36,7 +38,7 @@ const TableOrders = () => {
   const hdlGetOrders = async (token) => {
     getOrdersAdmin(token) // api call
       .then((res) => {
-        // console.log("Orders fetched:", res.data.ListOrders);
+        console.log("Orders fetched:", res.data.ListOrders);
         setOrders(res.data.ListOrders);
       })
       .catch((error) => {
@@ -150,11 +152,14 @@ const TableOrders = () => {
                     <div className="font-bold text-slate-700">#{order.id}</div>
                     <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                       <Clock size={10} />
-                      {new Date(order.createdAt).toLocaleDateString("th-TH")}
+                      {date(order.createdAt)}
                     </div>
                   </td>
                   {/* 2.Customer */}
                   <td className="px-6 py-4">
+                    <div className="text-xs text-slate-500 text-center">
+                      {order.orderedBy.name}
+                    </div>
                     <div className="text-xs text-slate-500 text-center">
                       {order.orderedBy.email}
                     </div>
@@ -170,6 +175,7 @@ const TableOrders = () => {
                     {/* Payment Method */}
                     <div className="text-xs text-slate-600 mt-1">
                       via: {order.stripePaymentId}
+                      <PaymentBadge paymentStatus={order.status} />
                     </div>
                   </td>
                   {/* 4. Status Column */}
@@ -246,6 +252,7 @@ const TableOrders = () => {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
                   <p className="text-xs text-slate-500 uppercase">Customer</p>
+                  <p className="font-medium">{selectedOrder.orderedBy.name}</p>
                   <p className="font-medium">{selectedOrder.orderedBy.email}</p>
                   <p className="text-sm text-slate-600">
                     {selectedOrder.orderedBy.address}
@@ -256,7 +263,7 @@ const TableOrders = () => {
                     Total Amount
                   </p>
                   <p className="text-2xl font-bold text-indigo-600">
-                    ฿{Number(selectedOrder.cartTotal).toLocaleString()}
+                    ฿{numberFormat(selectedOrder.cartTotal)}
                   </p>
                 </div>
               </div>

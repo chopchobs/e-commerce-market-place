@@ -1,29 +1,6 @@
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
-// GET - Users
-export const listUsers = async (token) => {
-  return await axios.get(`${API_URL}/api/users`, token, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
-// Post - Change Status
-export const changeStatusUser = async (token, data) => {
-  return await axios.post(`${API_URL}/api/change-status`, token, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
-// Post - Change Role
-export const changeRoleUser = async (token, data) => {
-  return await axios.post(`${API_URL}/api/change-role`, token, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
+
 // Post - Create User's Cart
 export const createUserCart = async (token, cart) => {
   return await axios.post(`${API_URL}/api/user/cart`, cart, {
