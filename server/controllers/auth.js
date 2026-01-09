@@ -7,14 +7,13 @@ exports.register = async (req, res, next) => {
   try {
     // code
     const { email, password } = req.body;
-    // Step 1: IF NOT email, password
+    // Validate Email, Pass
     if (!email) {
       res.status(500).json({ message: "Email is required !!" });
     }
     if (!password) {
       res.status(500).json({ message: "Password is required !!" });
     }
-
     // Step 2: Check Email DB
     const user = await prisma.user.findFirst({
       where: {

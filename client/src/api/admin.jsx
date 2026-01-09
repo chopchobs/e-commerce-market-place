@@ -12,22 +12,29 @@ export const listUsers = async (token) => {
   });
 };
 // Post - Change Status (Enable/Disable)
-export const changeStatusUser = async (token, data) => {
-  return await axios.post(`${API_URL}/api/admin/change-status`, token, data, {
+export const changeStatusUser = async (token, value) => {
+  return await axios.post(`${API_URL}/api/admin/change-status`, value, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 };
 // Post - Change Role (Admin/User)
-export const changeRoleUser = async (token, data) => {
-  return await axios.post(`${API_URL}/api/admin/change-role`, token, data, {
+export const changeRoleUser = async (token, value) => {
+  return await axios.post(`${API_URL}/api/admin/change-role`, value, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 };
-
+// Delete - User
+export const removeUser = async (token, id) => {
+  return await axios.delete(`${API_URL}/api/admin/remove-user/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 // --- Orders Management ---
 // Put(edit) - Change Order Status (Admin)
 export const updateOrderStatus = async (token, orderId, orderStatus) => {

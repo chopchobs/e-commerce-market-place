@@ -79,6 +79,9 @@ const TableOrders = () => {
       })
       .catch((error) => {
         console.error("Error deleting order:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
   // Status
