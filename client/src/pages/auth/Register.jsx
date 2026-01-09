@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const Register = () => {
   // JS
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const Register = () => {
     setIsLoading(true);
     // TO DB
     try {
-      const res = await axios.post("http://localhost:5001/api/register", form);
+      const res = await axios.post(`${API_URL}/api/register`, form);
       Swal.fire({
         title: "Register Success!",
         text: res.data.message,

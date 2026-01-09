@@ -6,6 +6,7 @@ const {
   getListUsersAdmin,
   AddChangeStatus,
   AddChangeRole,
+  removeUsers,
 } = require("../controllers/admin");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 const route = express();
@@ -14,6 +15,7 @@ const route = express();
 route.get("/admin/users", authCheck, adminCheck, getListUsersAdmin);
 route.post("/admin/change-role", authCheck, adminCheck, AddChangeRole);
 route.post("/admin/change-status", authCheck, adminCheck, AddChangeStatus);
+route.delete("/admin/remove-user/:id", authCheck, adminCheck, removeUsers);
 // ---- order ----
 route.put("/admin/order-status", authCheck, adminCheck, changOrderStatusAdmin);
 route.get("/admin/orders", authCheck, adminCheck, ListAdminOrder);

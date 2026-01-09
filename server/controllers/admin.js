@@ -51,8 +51,13 @@ exports.AddChangeRole = async (req, res, next) => {
   try {
     // code
     const { id, role } = req.body;
+    // console.log("REQ BODY:", req.body);
+    const idNum = Number(id);
+    if (isNaN(idNum)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
     const UpdateStatusRole = await prisma.user.update({
-      where: { id: Number(id) },
+      where: { id: idNum },
       data: { role: role },
       select: {
         id: true,
@@ -67,8 +72,32 @@ exports.AddChangeRole = async (req, res, next) => {
       message: "Add Change Role Successfully",
     });
   } catch (error) {
-    next(error);
     res.status(500).json({ message: "Failed to Add Change Role" });
+  }
+};
+// Delete User
+exports.removeUsers = async (req, res, nex) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+      include: {
+        orders: true,
+      },
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.orders.length > 0) {
+      return res.status(400).json({
+        message:
+          "Cannot delete user with active orders. Please disable instead.",
+      });
+    }
+    await prisma.user.delete({ where: { id: Number(id) } });
+    res.status(200).send("User Deleted");
+  } catch (error) {
+    res.status(500).json({ message: "Failed to Delete User" });
   }
 };
 
