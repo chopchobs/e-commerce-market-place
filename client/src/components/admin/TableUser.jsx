@@ -74,7 +74,7 @@ const TableUser = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     });
-    if (!result.isConfirmed) result;
+    if (!result.isConfirmed) return;
     setLoading(true);
     removeUser(token, id)
       .then((res) => {
@@ -125,96 +125,105 @@ const TableUser = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">
-              <th className="px-6 py-4">No.</th>
-              <th className="px-6 py-4">Email</th>
-              <th className="px-6 py-4">Date</th>
-              <th className="px-6 py-4">Role</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Actions</th>
+              <th className="px-6 py-4 ">No.</th>
+              <th className="px-6 py-4 text-center">Email</th>
+              <th className="px-6 py-4 text-center">Date</th>
+              <th className="px-6 py-4 text-center">Role</th>
+              <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-center">Actions</th>
             </tr>
           </thead>
-        </table>
-        {/* Loop Map - Users*/}
-        <tbody className="divide-y divide-slate-100 text-sm">
-          {user.map((el, index) => {
-            return (
-              <tr
-                key={el.id}
-                className="hover:bg-indigo-50/30 transition-colors duration-150 group"
-              >
-                {/* 1. Sequence */}
-                <td className="px-6 py-4 text-slate-500 font-mono text-xs">
-                  {index + 1}
-                </td>
-                {/* 2. Email */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border border-slate-200 text-xs">
-                      {el.email?.charAt(0).toUpperCase()}
+          {/* Loop Map - Users*/}
+          <tbody className="divide-y divide-slate-100 text-sm">
+            {user.map((el, index) => {
+              return (
+                <tr
+                  key={el.id}
+                  className="hover:bg-indigo-50/30 transition-colors duration-150 group"
+                >
+                  {/* 1. Sequence */}
+                  <td className="px-6 py-4 text-slate-500 font-mono text-xs">
+                    {index + 1}
+                  </td>
+
+                  {/* 2. Email */}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border border-slate-200 text-xs">
+                        {el.email.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="font-medium text-slate-800">
+                        {el.email}
+                      </div>
                     </div>
-                    <div className="font-medium text-slate-800">{el.email}</div>
-                  </div>
-                </td>
-                {/* 3. Date */}
-                <td className="px-6 py-4 text-slate-500 text-xs text0ce">
-                  {date(user.createdAt)}
-                  <br />
-                  <span className="text-[10px] text-slate-400">
-                    Last update: {date(user.updatedAt)}
-                  </span>
-                </td>
-                {/* 4. Role Dropdown*/}
-                <td className="px-6 py-4">
-                  <select
-                    value={el.role}
-                    onChange={(e) => hdlChangeRole(el.id, e.target.value)}
-                    className={`
-                        text-xs font-semibold px-2 py-1 rounded-md border-none cursor-pointer focus:ring-0
-                        ${
-                          el.role === "admin"
-                            ? "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                        }
-                    `}
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                  </select>
-                </td>
-                {/* 5. Status Toggle */}
-                <td className="px-6 py-4 items-center">
-                  <button
-                    onClick={() => hdlChangeStatus(el.id, el.enabled)}
-                    className={`
-                        inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all
-                        ${
-                          el.enabled
-                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                            : "bg-red-100 text-red-700 hover:bg-red-200"
-                        }
-                    `}
-                  >
-                    {el.enabled ? (
-                      <CheckCircle size={12} />
-                    ) : (
-                      <XCircle size={12} />
-                    )}
-                    {el.enabled ? "Active" : "Inactive"}
-                  </button>
-                </td>
-                {/* 6. Actions */}
-                <td className="px-6 py-4 items-center">
-                  <button
-                    onClick={() => hdlDeleteUser(token, el.id)}
-                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
+                  </td>
+
+                  {/* 3. Date  */}
+                  <td className="px-6 py-4 text-center text-slate-500 text-xs">
+                    {date(el.createdAt)}
+                    {/* {new Date(el.createdAt).toLocaleDateString("th-TH")} */}
+                    <br />
+                    <span className="text-[10px] text-slate-400">
+                      Last update: {date(el.updatedAt)}
+                      {/* {new Date(el.updatedAt).toLocaleDateString("th-TH")} */}
+                    </span>
+                  </td>
+
+                  {/* 4. Role  */}
+                  <td className="px-6 py-4 text-center">
+                    <select
+                      value={el.role}
+                      onChange={(e) => hdlChangeRole(el.id, e.target.value)}
+                      className={`
+                          text-xs font-semibold px-2 py-1 rounded-md border-none cursor-pointer focus:ring-0
+                          ${
+                            el.role === "admin"
+                              ? "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }
+                      `}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="user">User</option>
+                    </select>
+                  </td>
+
+                  {/* 5. Status  */}
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => hdlChangeStatus(el.id, el.enabled)}
+                      className={`
+                          inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all
+                          ${
+                            el.enabled
+                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                              : "bg-red-100 text-red-700 hover:bg-red-200"
+                          }
+                      `}
+                    >
+                      {el.enabled ? (
+                        <CheckCircle size={12} />
+                      ) : (
+                        <XCircle size={12} />
+                      )}
+                      {el.enabled ? "Active" : "Inactive"}
+                    </button>
+                  </td>
+
+                  {/* 6. Actions  */}
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => hdlDeleteUser(token, el.id)}
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
         {user.length === 0 && !isLoading && (
           <div className="text-center p-12 text-slate-500">No users found</div>
         )}
