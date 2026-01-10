@@ -14,6 +14,7 @@ npm i rc-slider
 npm i lodash
 npm npm i numeral
 npm install moment
+npm install motion
 
 npm install @radix-ui/themes
 npm install @react-oauth/google@latest

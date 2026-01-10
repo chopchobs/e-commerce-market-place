@@ -29,21 +29,21 @@ const MainNav = () => {
                 <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all group-hover:w-full"></span>
               </Link>
               <Link
-                to={"shop"}
+                to={"/shop"}
                 className=" group relative text-sm font-medium text-gray-500 hover:text-black transition-colors"
               >
                 <span className="font-medium text-sm">SHOP</span>
                 <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all group-hover:w-full"></span>
               </Link>
               <Link
-                to={"about"}
+                to={"/about"}
                 className=" group relative text-sm font-medium text-gray-500 hover:text-black transition-colors"
               >
                 <span className="font-medium text-sm">ABOUT</span>
                 <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-black transition-all group-hover:w-full"></span>
               </Link>
               <Link
-                to={"contact"}
+                to={"/contact"}
                 className=" group relative text-sm font-medium text-gray-500 hover:text-black transition-colors"
               >
                 <span className="font-medium text-sm">CONTACT</span>

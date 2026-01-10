@@ -8,39 +8,75 @@ import { Wallet } from "lucide-react";
 import "../stripe.css";
 import useEcomStore from "../store/ecom-store";
 import { saveUserOrder } from "../api/user";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
-export default function CheckoutForm({ address, handleSaveAddress }) {
+export default function CheckoutForm({ handleSaveAddress }) {
   const stripe = useStripe();
   const elements = useElements();
   const token = useEcomStore((state) => state.token);
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      return;
+    }
+    setIsLoading(true);
     // data - address
     const isAddressSaved = await handleSaveAddress();
-    // validate
+    // validate - address
     if (!isAddressSaved) {
+      setIsLoading(false);
       return;
-    } else {
-      setIsLoading(true);
     }
-    // start
+    // 2. Paid Credit Card with Stripe (start)
     const payload = await stripe.confirmPayment({
       elements,
-
       redirect: "if_required",
     });
-    // validate stripe
+    // validate stripe - error
     if (payload.error) {
-      setMessage(error.message);
-    } else {
-      // Create order - APi Call
+      setMessage(payload.error.message);
+      console.log("error", payload.error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Payment Failed",
+        text: payload.error.message,
+      });
+    } else if (payload.paymentIntent.status === "succeeded") {
+      // ✅ succeeded -> Record Order to Backend
+      console.log("Ready or SaveOrder");
+      // // Create order - APi Call
       saveUserOrder(token, payload)
-        .then((res) => console.log(res))
-        .catch((error) => console.log(error));
+        .then((res) => {
+          console.log(res);
+          // clearCart();  - พรุ้งนี้มาทำ
+          Swal.fire({
+            icon: "success",
+            title: "Payment Success",
+            text: "Order placed successfully!",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          navigate("/user/history");
+        })
+        .catch((error) => {
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            title: "Order Failed",
+            text: "Payment success but failed to save order.",
+          });
+        });
+    } else {
+      console.log("Something Wrong!!!");
+      Swal.fire({
+        icon: "warning",
+        title: "Payment Failed",
+        text: "Payment failed .",
+      });
     }
     setIsLoading(false);
   };

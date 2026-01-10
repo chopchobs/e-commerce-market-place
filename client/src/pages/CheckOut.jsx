@@ -92,7 +92,6 @@ const CheckOut = () => {
               <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <MapPin className="text-indigo-600" /> Shipping Address
               </h2>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -103,7 +102,7 @@ const CheckOut = () => {
                     name="name"
                     type="text"
                     placeholder="John Doe"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
                   />
                 </div>
                 <div>
@@ -115,7 +114,7 @@ const CheckOut = () => {
                     name="phoneNumber"
                     type="text"
                     placeholder="081-234-5678"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
                   />
                 </div>
                 <div>
@@ -127,7 +126,7 @@ const CheckOut = () => {
                     name="email"
                     type="email"
                     placeholder="john@example.com"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -139,7 +138,7 @@ const CheckOut = () => {
                     name="address"
                     rows="3"
                     placeholder="123 Street, District, Province, Zip Code"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all resize-none"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all resize-none placeholder-slate-300 placeholder-opacity-60"
                   />
                 </div>
               </div>
