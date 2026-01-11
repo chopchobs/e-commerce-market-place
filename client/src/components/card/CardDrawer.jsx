@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { createUserCart } from "../../api/user";
 import { numberFormat } from "../utility/number";
+
 const CartDrawer = () => {
+  // navigate
+  const navigate = useNavigate();
   // zustand
   const user = useEcomStore((state) => state.user);
   const token = useEcomStore((state) => state.token);
-  const navigate = useNavigate();
   const actionCloseCart = useEcomStore((state) => state.actionCloseCart);
   const isOpen = useEcomStore((state) => state.isOpen);
   const cart = useEcomStore((state) => state.carts);
@@ -154,7 +156,10 @@ const CartDrawer = () => {
               </div>
               <p className="font-medium text-slate-500">Your cart is empty.</p>
               <button
-                onClick={actionCloseCart}
+                onClick={() => {
+                  actionCloseCart();
+                  navigate("/shop");
+                }}
                 className="text-sm text-indigo-600 font-semibold hover:underline"
               >
                 Continue Shopping

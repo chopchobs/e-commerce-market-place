@@ -6,10 +6,14 @@ import { addressUserCart, listUserCart } from "../api/user";
 import Swal from "sweetalert2";
 import Payment from "./user/payment";
 import numberFormat from "../components/utility/number";
-const CheckOut = () => {
-  const token = useEcomStore((state) => state.token);
-  const navigate = useNavigate();
 
+const CheckOut = () => {
+  // Zustand
+  const token = useEcomStore((state) => state.token);
+  const actionUpdateUser = useEcomStore((state) => state.actionUpdateUser);
+  // fly to
+  const navigate = useNavigate();
+  // State
   const [products, setProducts] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
@@ -57,15 +61,17 @@ const CheckOut = () => {
       !address.name ||
       !address.phoneNumber
     ) {
-      return Swal.fire({
-        title: "Please fill in all address fields",
-        icon: "warning",
-      });
       return false;
     }
 
     try {
+      // Update to DB
       await addressUserCart(token, address);
+      actionUpdateUser({
+        name: address.name,
+        address: address.address,
+        phoneNumber: address.phoneNumber,
+      });
       return true; // true - record
     } catch (error) {
       console.log(error);

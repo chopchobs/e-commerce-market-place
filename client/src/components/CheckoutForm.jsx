@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   PaymentElement,
   useStripe,
@@ -12,12 +12,14 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 export default function CheckoutForm({ handleSaveAddress }) {
+  const token = useEcomStore((state) => state.token);
+  const clearCart = useEcomStore((state) => state.clearCart);
   const stripe = useStripe();
   const elements = useElements();
-  const token = useEcomStore((state) => state.token);
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  // function submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) {
@@ -52,7 +54,7 @@ export default function CheckoutForm({ handleSaveAddress }) {
       saveUserOrder(token, payload)
         .then((res) => {
           console.log(res);
-          // clearCart();  - พรุ้งนี้มาทำ
+          clearCart(); // clear
           Swal.fire({
             icon: "success",
             title: "Payment Success",
@@ -121,7 +123,6 @@ export default function CheckoutForm({ handleSaveAddress }) {
             )}
           </span>
         </button>
-
         {/* Error Message */}
         {message && (
           <div

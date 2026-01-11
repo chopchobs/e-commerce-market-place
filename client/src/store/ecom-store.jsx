@@ -23,7 +23,20 @@ const initialState = {
 // Ecom Store
 const ecomStore = (set, get) => ({
   ...initialState,
+  // Logout
+  Logout: () => {
+    set({
+      user: null,
+      token: null,
+      categories: [],
+      products: [],
+      carts: [],
+      readProduct: null,
+      isOpen: false,
+    });
+  },
   // --- Cart Action ---
+  // Open - Close
   actionOpenCart: () => set({ isOpen: true }),
   actionCloseCart: () => set({ isOpen: false }),
   // Calculated
@@ -121,18 +134,29 @@ const ecomStore = (set, get) => ({
       console.error("Error searching products:", error);
     }
   },
+  // clearCart
+  clearCart: () => {
+    set({ carts: [] });
+  },
   // --------------------  System --------------------
   // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
     const res = await axios.post(`${API_URL}/api/login`, Data);
-    console.log(res);
+    // console.log(res);
     // user , token 🌎
+    // console.log("SERVER RESPONSE:", res.data.payload);
     set({
       user: res.data.payload,
       token: res.data.token,
     });
     return res;
+    // 🟢 Update User Data
   },
+  // 🟢 Update User Data
+  actionUpdateUser: (newData) =>
+    set((state) => ({
+      user: { ...state.user, ...newData },
+    })),
   // Logout (Reset to Initial State)
   logout: () => {
     set(initialState);
