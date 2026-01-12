@@ -169,117 +169,63 @@ exports.RemoveProduct = async (req, res, next) => {
   }
 };
 
-// ------- ListProduct By Filters -------
-exports.ListProductByFilters = async (req, res, next) => {
-  try {
-    // code
-    const { sort, order, limit } = req.body;
-    //
-    const ListFilters = await prisma.product.findMany({
-      take: limit,
-      orderBy: { [sort]: order },
-      include: { category: true },
-    });
-    res.status(200).json({
-      ListFilters,
-      message: "List Product Filters Successfully",
-    });
-  } catch (error) {
-    next(error);
-    res.status(500).json({
-      message: "Failed to List Product Filters",
-    });
-  }
-};
 // ------- Search Filter -------
-// 1.Query ( ค้นหาด้วยคำ )
-const handleQuery = async (req, res, query, next) => {
-  try {
-    //code
-    const products = await prisma.product.findMany({
-      where: {
-        title: {
-          contains: query, //contains - มีคำนี้อยู่ภายในข้อความ
-        },
-      },
-      include: {
-        category: true,
-        images: true,
-      },
-    });
-    res.status(200).send({
-      SearchFilter: products,
-      message: "Search Query Success",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-// 2.Category [ หมวดหมู่ ]
-const handleCategory = async (req, res, categoryId, next) => {
-  try {
-    // code
-    const products = await prisma.product.findMany({
-      where: {
-        categoryId: {
-          in: categoryId.map((id) => Number(id)),
-        },
-      },
-      // show Card - Front
-      include: {
-        category: true,
-        images: true,
-      },
-    });
-    res.status(200).send({
-      SearchFilter: products,
-      message: "Search Category Success",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-// 3.Price [ ราคา ]
-const handlePrice = async (req, res, priceRange, next) => {
-  try {
-    const products = await prisma.product.findMany({
-      where: {
-        price: {
-          gte: priceRange[0],
-          lte: priceRange[1],
-        },
-      },
-      include: {
-        category: true,
-        images: true,
-      },
-    });
-    res.status(200).send({
-      SearchFilter: products,
-      message: "Search Price Success",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Main Search Filter ( public ) - Query, Category, Price
+// Main Search Filter ( public ) - Query, Category, Price, Sort,limit
 exports.SearchFilter = async (req, res, next) => {
   try {
-    // code
-    const { query, price, category } = req.body;
+    // code Category,SortBy
+    const { query, price, category, sort, limit } = req.body;
+    // create empty object
+    const where = {};
+    // Text Search
     if (query) {
-      console.log("Mode: Query", query);
-      await handleQuery(req, res, query, next);
-    } else if (category) {
-      console.log("Mode: Category", category);
-      await handleCategory(req, res, category, next);
-    } else if (price) {
-      console.log("Mode: Category", price);
-      await handlePrice(req, res, price, next);
-    } else {
-      res.send({ SearchFilter: [], message: "No Filter Received" });
+      where.title = {
+        contains: query,
+      };
     }
+    // Category [other-types [1,3,6] ]
+    if (category && category.length > 0) {
+      where.categoryId = {
+        in: category.map((id) => Number(id)),
+      };
+    }
+    // Price Range
+    if (price && price.length === 2) {
+      where.price = {
+        gte: price[0],
+        lte: price[1],
+      };
+    }
+    // orderBy
+    const handleSort = (sortValue) => {
+      switch (sortValue) {
+        case "price_desc":
+          return { price: "desc" };
+        case "price_asc":
+          return { price: "asc" };
+        case "popular":
+          return { sold: "desc" };
+        case "newest":
+        default:
+          return { createdAt: "desc" };
+      }
+    };
+    // function
+    const orderBy = handleSort(sort);
+    //  ยิง Query
+    const products = await prisma.product.findMany({
+      take: parseInt(limit) || 20, // จำกัดจำนวน
+      where: where, // ใส่เงื่อนไข Search/Filter
+      orderBy: orderBy, // ใส่เงื่อนไข Sort
+      include: {
+        category: true,
+        images: true,
+      },
+    });
+    res.status(200).json({
+      ListFilters: products,
+      message: "Search & Filter Success",
+    });
   } catch (error) {
     next(error);
     res.status(500).json({

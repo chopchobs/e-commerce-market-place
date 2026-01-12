@@ -6,65 +6,65 @@ import "rc-slider/assets/index.css";
 import numberFormat from "../utility/number";
 const SearchCard = () => {
   //zustand store - Product 🌎
-  // Products ( public )
-  const listProduct = useEcomStore((state) => state.listProduct);
-  const products = useEcomStore((state) => state.products);
-  // Category ( public )
+  const actionSearchFilters = useEcomStore(
+    (state) => state.actionSearchFilters
+  );
   const categories = useEcomStore((state) => state.categories);
   const fetchCategories = useEcomStore((state) => state.fetchCategories);
-  // Query, Category, Price
-  const actionSearchProduct = useEcomStore(
-    (state) => state.actionSearchProduct
-  );
-  // 1. Search by text ( Query )
+
+  // --- 2. Search Text ---
   const [text, setText] = useState("");
   useEffect(() => {
     const delay = setTimeout(() => {
       if (text) {
-        actionSearchProduct({ query: text });
+        actionSearchFilters({ query: text });
       } else {
-        listProduct(20);
+        actionSearchFilters({ query: "" }); // ส่งค่าว่างไป Store จะจัดการเอง
       }
     }, 300);
     return () => clearTimeout(delay);
   }, [text]);
-  // 2. Select - Categories
+  // --- 3. Categories ---
   const [selectCategory, setSelectCategory] = useState([]);
   useEffect(() => {
     fetchCategories();
   }, []);
+  // function Category
   const handleCategory = (e) => {
     const inCheck = Number(e.target.value);
     const inState = [...selectCategory];
     const findCheck = inState.indexOf(inCheck); // ถ้าไม่เจอ จะ return -1
     if (findCheck === -1) {
-      inState.push(inCheck); // ไม่เจอ -> เพิ่ม 1
+      inState.push(inCheck);
     } else {
-      inState.splice(findCheck, 1); // เจอ -> ลบออก 1 ตัว
+      inState.splice(findCheck, 1);
     }
-    setSelectCategory(inState); // Update STATE
-    if (inState.length > 0) {
-      actionSearchProduct({ category: inState });
-    } else {
-      listProduct(20);
-    }
+    setSelectCategory(inState);
+    // ส่งค่าไปรวมกับ Sort/Price ใน Store ทันที
+    actionSearchFilters({ category: inState });
   };
-  //3. Search by price range
+  // --- 4. Price ---
   const [price, setPrice] = useState([0, 100000]);
   const handlePriceChange = (value) => {
     setPrice(value);
   };
   const handlePriceAfterChange = (value) => {
-    actionSearchProduct({ price: value });
+    actionSearchFilters({ price: value }); // ส่งค่าไป Store
   };
-  // 4. ClearFilter
+  // --- 5. Clear Filter ---
   const handleClearFilter = () => {
+    // Reset ค่าหน้าจอ
     setText("");
     setSelectCategory([]);
     setPrice([0, 100000]);
-    listProduct(20);
+    // Reset ค่าใน Store (ส่งค่า Default กลับไป)
+    actionSearchFilters({
+      query: "",
+      category: [],
+      price: [0, 100000],
+      sort: "newest", // Reset การเรียงลำดับด้วยถ้าต้องการ
+    });
   };
-
   return (
     <div className="w-full bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-8">
       {/* --- 1. Search Bar --- */}

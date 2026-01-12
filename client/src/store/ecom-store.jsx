@@ -5,7 +5,7 @@ import { ListCategory } from "../api/createCategory";
 import {
   CountProducts,
   ReadProduct,
-  SearchProducts,
+  SearchFilters,
 } from "../api/createProducts";
 import _ from "lodash";
 const API_URL = import.meta.env.VITE_API_URL; // API URL from .env file
@@ -19,21 +19,21 @@ const initialState = {
   carts: [],
   readProduct: null,
   isOpen: false,
+  loading: false,
+  productFilter: {
+    query: "",
+    category: [],
+    price: [0, 100000],
+    sort: "newest",
+    limit: 20,
+  },
 };
 // Ecom Store
 const ecomStore = (set, get) => ({
   ...initialState,
   // Logout
   Logout: () => {
-    set({
-      user: null,
-      token: null,
-      categories: [],
-      products: [],
-      carts: [],
-      readProduct: null,
-      isOpen: false,
-    });
+    set(initialState);
   },
   // --- Cart Action ---
   // Open - Close
@@ -114,6 +114,8 @@ const ecomStore = (set, get) => ({
   // Fetch Product Data by ID ( for Read , Update , Delete )
   fetchProduct: async (id) => {
     try {
+      // ✅  token จาก store
+      const token = get().token;
       const res = await ReadProduct(token, id);
       // setForm with fetched data (old data)
       set({
@@ -123,17 +125,32 @@ const ecomStore = (set, get) => ({
       console.error("Error fetching product:", error);
     }
   },
-  // SearchFilter ( public ) - Query, Category, Price
-  actionSearchProduct: async (arg) => {
+
+  // SearchFilter ( public ) - Query, Category, Price,sort,limit
+  actionSearchFilters: async (arg) => {
     try {
-      const res = await SearchProducts(arg);
+      // default form Store
+      const currentFilter = get().productFilter;
+      // Add all: default + New data (arg)
+      const updatedFilter = { ...currentFilter, ...arg };
+      // set to productFilter (last)
       set({
-        products: res.data.SearchFilter || [],
+        productFilter: updatedFilter,
+        loading: true,
+      });
+      // Call API
+      const res = await SearchFilters(updatedFilter);
+      // set to products
+      set({
+        products: res.data.ListFilters || [],
+        loading: false,
       });
     } catch (error) {
       console.error("Error searching products:", error);
+      set({ loading: false });
     }
   },
+
   // clearCart
   clearCart: () => {
     set({ carts: [] });
@@ -142,7 +159,6 @@ const ecomStore = (set, get) => ({
   // user , token 👨🏻‍💻
   actionLogin: async (Data) => {
     const res = await axios.post(`${API_URL}/api/login`, Data);
-    // console.log(res);
     // user , token 🌎
     // console.log("SERVER RESPONSE:", res.data.payload);
     set({
