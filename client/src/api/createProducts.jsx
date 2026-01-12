@@ -38,16 +38,8 @@ export const RemoveProducts = async (token, id) => {
     },
   });
 };
-// Product - Filter
-export const FilterProducts = async (token, data) => {
-  return await axios.post("http://localhost:5001/api/product-by", data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
 // Product - Search (Public)
-export const SearchProducts = async (arg) => {
+export const SearchFilters = async (arg) => {
   return await axios.post(`${API_URL}/api/search/filter`, arg);
 };
 

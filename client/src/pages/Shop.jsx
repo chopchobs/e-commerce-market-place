@@ -3,21 +3,20 @@ import useEcomStore from "../store/ecom-store";
 import { useEffect } from "react";
 import ProductList from "../components/card/ProductList";
 import SearchCard from "../components/card/SearchCard";
+import SortBy from "./SortBy";
 
 const Shop = () => {
   // JS
   // zustand store 🌎
-  const listProduct = useEcomStore((state) => state.listProduct);
   const getProducts = useEcomStore((state) => state.products);
   const fetchCategories = useEcomStore((state) => state.fetchCategories);
-  const categories = useEcomStore((state) => state.categories);
-  // console.log("Products in Shop:", getProducts);
-  // console.log("Categories in Shop:", categories);
+  const loading = useEcomStore((state) => state.loading);
+
   // Fetch products on component mount
   useEffect(() => {
-    listProduct();
     fetchCategories();
   }, []);
+
   return (
     <div className="w-full bg-white min-h-screen font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -34,15 +33,7 @@ const Shop = () => {
             </button>
             {/* 1.2 Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500 hidden sm:block">
-                Sort by:
-              </span>
-              <select className="text-sm border-none focus:ring-0 font-medium text-slate-700 bg-transparent cursor-pointer hover:text-indigo-600">
-                <option>Most Popular</option>
-                <option>Newest</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-              </select>
+              <SortBy />
             </div>
           </div>
         </div>
@@ -55,7 +46,13 @@ const Shop = () => {
             </div>
           </aside>
           {/* Product List  - Cart */}
-          <ProductList getProducts={getProducts} />
+          {loading ? (
+            <div className="text-center p-10 text-xl font-bold text-gray-400">
+              Loading products... ⏳
+            </div>
+          ) : (
+            <ProductList getProducts={getProducts} />
+          )}
         </div>
       </div>
     </div>
