@@ -1,6 +1,11 @@
 {
     "prisma.pinToPrisma6": true,
     "cSpell.words": [
-        "orderstatus"
+        "orderstatus",
+        "zxcvbn",
+        "จุดสำคัญ",
+        "แดงทันทีที",
+        "ตรวจสอบ",
+        "ป้องกันการกดรัวๆ"
     ]
 }

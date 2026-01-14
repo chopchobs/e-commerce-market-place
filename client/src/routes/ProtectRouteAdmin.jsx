@@ -39,9 +39,7 @@ export const ProtectRouteAdmin = ({ element }) => {
     return element;
   }
   // ถ้า "ไม่ผ่าน" -> ดีดไป Login (ไม่ต้องรอ LoadingPage นับเวลา)
-  return (
-    <LoadingPage enableRedirect={true} countStart={3} redirectPath="/login" />
-  );
+  return <LoadingPage enableRedirect={true} countStart={3} redirectPath="/" />;
 
   // return ok ? element : <LoadingPage />;
 };
