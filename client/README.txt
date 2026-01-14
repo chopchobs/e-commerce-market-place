@@ -22,7 +22,7 @@ npm install @react-oauth/google@latest
 npm i react-image-file-resizer
 npm i react-icons
 
-npm install react-hook-form zod @hookform/resolvers zxcvbn
+npm install react-hook-form zod @hookform/resolvers @zxcvbn-ts/core @zxcvbn-ts/language-common
 
 --------------------------
 
