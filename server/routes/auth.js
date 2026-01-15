@@ -13,7 +13,6 @@ const { authCheck, adminCheck } = require("../middleware/authCheck");
 router.post("/register", register);
 router.post("/login", login);
 router.post("/current-user", authCheck, currentUser);
-
 router.post("/current-admin", authCheck, adminCheck, currentAdmin);
 
 // Step 2: Import auth routes

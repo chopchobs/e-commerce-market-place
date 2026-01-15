@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -27,8 +27,11 @@ const registerSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"], // Error appears at the confirmPassword field
   });
-// components
+
+// components - Register
 const Register = () => {
+  // State - Password
+  const [passwordScore, setPasswordScore] = useState(0);
   // useForm Hook
   const {
     register,
@@ -39,7 +42,33 @@ const Register = () => {
     resolver: zodResolver(registerSchema),
     mode: "all", // 🚨 จุดสำคัญ: ตรวจสอบ Real-time (แดงทันทีที่ผิด)
   });
-
+  // Watch password value continuously
+  const passwordValue = watch("password");
+  // Update Score when password changes
+  useEffect(() => {
+    if (passwordValue) {
+      setPasswordScore(zxcvbn(passwordValue).score);
+    } else {
+      setPasswordScore(0);
+    }
+  }, [passwordValue]);
+  // --- Helper: Get Color & Label based on Score ---
+  const getStrengthStyles = (score) => {
+    switch (score) {
+      case 0:
+      case 1:
+        return { color: "bg-red-500", label: "Weak", width: "20%" };
+      case 2:
+        return { color: "bg-yellow-500", label: "Fair", width: "50%" };
+      case 3:
+        return { color: "bg-blue-500", label: "Good", width: "75%" };
+      case 4:
+        return { color: "bg-green-500", label: "Strong", width: "100%" };
+      default:
+        return { color: "bg-gray-200", label: "", width: "0%" };
+    }
+  };
+  const strengthInfo = getStrengthStyles(passwordScore);
   // fly to
   const navigate = useNavigate();
   // State
@@ -88,6 +117,7 @@ const Register = () => {
     }
   };
 
+  console.log(passwordScore);
   return (
     // 1. Background & Center Layout:
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -173,6 +203,26 @@ const Register = () => {
                       : "border-gray-300 focus:border-black"
                   }`}
                 />
+                {/* --- PASSWORD STRENGTH BAR --- */}
+                {passwordValue && (
+                  <div className="mt-2 transition-all duration-300 ease-in-out">
+                    <div className="h-2 w-full rounded-full bg-gray-200">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ease-out ${strengthInfo.color}`}
+                        style={{ width: strengthInfo.width }}
+                      ></div>
+                    </div>
+                    <p
+                      className={`mt-1 text-xs font-medium text-right ${strengthInfo.color.replace(
+                        "bg-",
+                        "text-"
+                      )}`}
+                    >
+                      Strength: {strengthInfo.label}
+                    </p>
+                  </div>
+                )}
+                {/* ConfirmPassword text */}
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.confirmPassword.message}
