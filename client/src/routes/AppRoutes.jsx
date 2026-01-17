@@ -20,6 +20,8 @@ import Contact from "../pages/Contact";
 import Payment from "../pages/user/payment";
 import History from "../pages/user/History";
 import ManageOrders from "../components/admin/ManageOrders";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,8 @@ const router = createBrowserRouter([
       { path: "checkout", element: <CheckOut /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password/:token", element: <ResetPassword /> },
     ],
   },
   {

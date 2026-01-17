@@ -105,8 +105,18 @@ const Login = () => {
                   id="email"
                   type="email"
                   placeholder="name@example.com"
-                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-black sm:text-sm outline-none transition-all"
+                  className={`block w-full rounded-lg border px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:ring-black sm:text-sm outline-none transition-all ${
+                    errors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:border-black"
+                  }`}
                 />
+                {/* ✅ เพิ่ม Error Message ให้ Email */}
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
 

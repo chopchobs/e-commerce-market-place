@@ -6,6 +6,8 @@ const {
   login,
   currentUser,
   currentAdmin,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/auth");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 
@@ -14,6 +16,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/current-user", authCheck, currentUser);
 router.post("/current-admin", authCheck, adminCheck, currentAdmin);
-
+// Forget-ResetPassword
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/", resetPassword);
 // Step 2: Import auth routes
 module.exports = router;

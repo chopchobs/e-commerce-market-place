@@ -24,3 +24,15 @@ export const CurrentAdmin = async (token) => {
     }
   );
 };
+// Forget-Reset Password
+// Forget
+export const forgotPassword = async (email) => {
+  return await axios.post(`${API_URL}/api/forgot-password`, { email });
+};
+// Reset
+export const resetPassword = async (token, newPassword) => {
+  return await axios.post(`${API_URL}/api/reset-password`, {
+    token,
+    newPassword,
+  });
+};

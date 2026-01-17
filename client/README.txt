@@ -15,6 +15,7 @@ npm i lodash
 npm npm i numeral
 npm install moment
 npm install motion
+npm i zod
 
 npm install @radix-ui/themes
 npm install @react-oauth/google@latest
