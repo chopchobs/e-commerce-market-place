@@ -2,6 +2,7 @@ const prisma = require("../config/prisma");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// ---- Auth ----
 // Registration
 exports.register = async (req, res, next) => {
   try {
@@ -43,7 +44,6 @@ exports.register = async (req, res, next) => {
     res.status(500).json({ message: "Registration failed" });
   }
 };
-
 // Login
 exports.login = async (req, res, next) => {
   try {
@@ -86,6 +86,59 @@ exports.login = async (req, res, next) => {
     res.status(500).json({ message: "Login failed" });
   }
 };
+// ---- Forget,ResetPassword ----
+// Forget
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    //  validate - check email
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+    // set token limit - 15mins
+    // SECRET_KEY - keep to .env
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.SECRET || "SECRET_KEY",
+      { expiresIn: "15m" }
+    );
+    // create link (Frontend URL)
+    const resetLink = `http://localhost:5173/reset-password/${token}`;
+    // 🔴 LOG LINK ออกมาดูใน Terminal (แทนการส่งอีเมลจริง)
+    console.log("SEND EMAIL TO:", email);
+    console.log("LINK RESET:", resetLink);
+
+    res.json({
+      message: "Password reset link sent to your email (Check Console)",
+    });
+  } catch (error) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+// Reset
+exports.resetPassword = async (req, res, next) => {
+  try {
+    // receive
+    const { token, newPassword } = req.body;
+    // validate token
+    const decoded = jwt.verify(token, process.env.SECRET || "SECRET_KEY");
+    // hash password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // update DB
+    await prisma.user.update({
+      where: { id: decoded.id },
+      data: { password: hashedPassword },
+    });
+    res.json({ message: "Password Update successfully! Please login." });
+  } catch (error) {
+    console.log("err", error);
+    res.status(400).json({ message: "Token Invalid or expired" });
+  }
+};
 
 // Fetch current User
 exports.currentUser = async (req, res, next) => {
@@ -112,7 +165,6 @@ exports.currentUser = async (req, res, next) => {
     res.status(500).json({ message: "Failed to fetch current User" });
   }
 };
-
 // Fetch current Admin
 exports.currentAdmin = async (req, res, next) => {
   try {
