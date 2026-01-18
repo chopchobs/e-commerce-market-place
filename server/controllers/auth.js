@@ -105,8 +105,10 @@ exports.forgotPassword = async (req, res, next) => {
       process.env.SECRET || "SECRET_KEY",
       { expiresIn: "15m" }
     );
+    // Front URL
+    const frontendUrl = process.env.FRONTEND_URL;
     // create link (Frontend URL)
-    const resetLink = `http://localhost:5173/reset-password/${token}`;
+    const resetLink = `${frontendUrl}/reset-password/${token}`;
     // 🔴 LOG LINK ออกมาดูใน Terminal (แทนการส่งอีเมลจริง)
     console.log("SEND EMAIL TO:", email);
     console.log("LINK RESET:", resetLink);

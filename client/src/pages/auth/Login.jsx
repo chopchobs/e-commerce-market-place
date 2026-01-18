@@ -147,6 +147,7 @@ const Login = () => {
             {/* Remember Me & Forgot Password Row */}
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center">
+                {/* Remember me*/}
                 <input
                   {...register("remember")}
                   id="remember-me"
@@ -162,7 +163,7 @@ const Login = () => {
               </div>
 
               <div className="text-sm">
-                {/* Link */}
+                {/* Forgot password? */}
                 <Link
                   to="/forgot-password"
                   className="font-medium text-black hover:underline"
