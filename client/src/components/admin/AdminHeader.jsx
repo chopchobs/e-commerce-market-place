@@ -1,13 +1,13 @@
 import { Search, Bell, MessageSquare, Settings } from "lucide-react";
 
-const AdminHeader = ({ title = "Overview" }) => {
+const AdminHeader = ({ title = "Dashboard Overview" }) => {
   return (
     <header className="bg-white border-b border-slate-200 h-20 px-8 flex items-center justify-between sticky top-0 z-20 shadow-sm">
       {/* Left Side: Page Title & Breadcrumbs */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">{title}</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Admin Panel <span className="text-slate-300 mx-2">/</span> {title}
+          Admin Panel <span className="text-slate-300 mx-2"></span>
         </p>
       </div>
 
