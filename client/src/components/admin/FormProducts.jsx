@@ -19,7 +19,6 @@ import {
   RemoveProducts,
   UploadImages,
 } from "../../api/createProducts"; // ตรวจสอบ path ให้ถูก
-import { formatCurrency } from "../utility/formatCurrency";
 import { getStockStatus } from "../utility/getStockStatus";
 import { Link } from "react-router-dom";
 
