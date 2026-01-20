@@ -1,5 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { User, Settings, LogOut, ChevronDown, CreditCard } from "lucide-react";
+import {
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+  CreditCard,
+  History,
+} from "lucide-react";
 import useEcomStore from "../store/ecom-store";
 import { useNavigate } from "react-router-dom";
 
@@ -41,7 +48,7 @@ const ProfileMenu = () => {
         <div className="relative">
           <img
             className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
-            src="https://i.ibb.co/08rJb0w/Avatar.png"
+            src="https://i.ibb.co/08rJb0w/Avatar.png" // ยังไม่มีรูปใน DB
             alt="User Avatar"
           />
           <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
@@ -75,12 +82,28 @@ const ProfileMenu = () => {
           </div>
 
           <ul className="py-2">
-            <MenuItem icon={<User size={16} />} text="My Profile" />
-            <MenuItem icon={<CreditCard size={16} />} text="Billing" />
-            <MenuItem icon={<Settings size={16} />} text="Settings" />
+            <MenuItem
+              icon={<User size={16} />}
+              text="My Profile"
+              onClick={() => navigate("/user")}
+            />
+            <MenuItem
+              icon={<CreditCard size={16} />}
+              text="Billing"
+              onClick={() => navigate("/user/billing")}
+            />
+            <MenuItem
+              icon={<History size={16} />}
+              text="History"
+              onClick={() => navigate("/user/history")}
+            />
+            <MenuItem
+              icon={<Settings size={16} />}
+              text="Settings"
+              onClick={() => navigate("/user/edit-profile")}
+            />
 
-            <div className="my-1 border-t border-gray-50"></div>
-
+            <div className="my-1 border-t border-gray-100"></div>
             <MenuItem
               icon={<LogOut size={16} />}
               text="Log Out"

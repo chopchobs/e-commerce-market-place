@@ -10,7 +10,6 @@ import LayoutAdmin from "../layouts/LayoutAdmin";
 import Dashboard from "../pages/admin/Dashboard";
 import Product from "../pages/admin/product";
 import LayoutUser from "../layouts/LayoutUser";
-import HomeUser from "../pages/user/HomeUser";
 import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
 import Manage from "../pages/admin/Manage";
@@ -22,6 +21,9 @@ import History from "../pages/user/History";
 import ManageOrders from "../components/admin/ManageOrders";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
+import UserProfile from "../pages/user/UserProfile";
+import EditProfile from "../pages/user/EditProfile";
+import Billing from "../pages/user/Billing";
 
 const router = createBrowserRouter([
   {
@@ -58,7 +60,9 @@ const router = createBrowserRouter([
     path: "/user",
     element: <ProtectRouteUser element={<LayoutUser />} />,
     children: [
-      { index: true, element: <HomeUser /> },
+      { index: true, element: <UserProfile /> },
+      { path: "edit-profile", element: <EditProfile /> },
+      { path: "billing", element: <Billing /> },
       { path: "payment", element: <Payment /> },
       { path: "history", element: <History /> },
     ],
