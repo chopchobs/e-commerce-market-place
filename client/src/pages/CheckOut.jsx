@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
 import { addressUserCart, listUserCart } from "../api/user";
 import Swal from "sweetalert2";
-import Payment from "./user/payment";
+import Payment from "./user/Payment";
 import numberFormat from "../components/utility/number";
 
 const CheckOut = () => {
