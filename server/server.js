@@ -1,9 +1,9 @@
 // Step 1 : import express module
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
 const { readdirSync } = require("fs");
-const cors = require("cors");
 
 const dotenv = require("dotenv");
 dotenv.config(); // load .env file
@@ -13,7 +13,7 @@ app.use(morgan("dev")); // show logs in the console server
 app.use(express.json({ limit: "30mb" })); // read JSON bodies
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: process.env.FRONTEND_URL || true, //
     credentials: true,
   }),
 ); // to connect to frontend and backend 💕
