@@ -7,7 +7,7 @@ import CheckoutForm from "../../components/CheckoutForm";
 import { payment } from "../../api/stripe"; // APi call
 // Stripe Key
 const stripePromise = loadStripe(
-  "pk_test_51ScTDSDvTcqo5clOrRxi5VhziZtYWjiFTQKBpI4Hzc6CuRixDTFUoMra8SgrRvH6woC4LowwvRhrggWCuHRSYAdh006PdYZbd1"
+  "pk_test_51ScTDSDvTcqo5clOrRxi5VhziZtYWjiFTQKBpI4Hzc6CuRixDTFUoMra8SgrRvH6woC4LowwvRhrggWCuHRSYAdh006PdYZbd1",
 );
 
 const Payment = ({ address, handleSaveAddress }) => {
