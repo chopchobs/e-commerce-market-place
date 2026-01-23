@@ -13,9 +13,9 @@ app.use(morgan("dev")); // show logs in the console server
 app.use(express.json({ limit: "30mb" })); // read JSON bodies
 app.use(
   cors({
-    origin: true,
+    origin: process.env.FRONTEND_URL || true,
     credentials: true,
-  })
+  }),
 ); // to connect to frontend and backend 💕
 
 // ✅read all routes files in the routes folder and register them ;)
