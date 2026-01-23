@@ -8,7 +8,7 @@ import Register from "../pages/auth/Register";
 import Layout from "../layouts/Layout";
 import LayoutAdmin from "../layouts/LayoutAdmin";
 import Dashboard from "../pages/admin/Dashboard";
-import Product from "../pages/admin/product";
+import Product from "../pages/admin/Product";
 import LayoutUser from "../layouts/LayoutUser";
 import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
