@@ -94,7 +94,7 @@ npx prisma db push
 
 
 /* Enjoy */
---------- Deploy Server to Vercel ------
+--------- Deploy Server to Render ------
 1. create vercel.json
 
 {

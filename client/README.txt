@@ -27,8 +27,8 @@ npm install react-hook-form zod @hookform/resolvers @zxcvbn-ts/core @zxcvbn-ts/l
 
 --------------------------
 
---------- Deploy DB to Supabase ------
-1. Login Supabase
+--------- Deploy DB to https://supabase.com/ ------
+1. Login https://supabase.com/
 2. .env
         DATABASE_URL = ""
         DIRECT_URL = ""
@@ -39,15 +39,23 @@ npm install react-hook-form zod @hookform/resolvers @zxcvbn-ts/core @zxcvbn-ts/l
         directUrl = env("DIRECT_URL")
         }
 
-npx prisma db push
+npx prisma generate
 
-----When update ----
+---- When update ----
+
 - DATABASE_URL : "?pgbouncer=true&connection_limit=1"
-npx prisma db push
+
+-- Delete migrate about mysql --
+
+npx prisma migrate dev
+
+
+
+
 
 
 /* Enjoy */
---------- Deploy Server to Vercel ------
+--------- Deploy Server to Render ------
 1. create vercel.json
 
 {
