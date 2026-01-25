@@ -1,25 +1,31 @@
-import { useState, useEffect, use } from "react";
-import { MapPin, ChevronLeft, Wallet, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  MapPin,
+  ChevronLeft,
+  User,
+  Phone,
+  Mail,
+  Home,
+  ShoppingBag,
+  CreditCard,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import useEcomStore from "../store/ecom-store"; // (ถ้าจะดึงของจริงมาโชว์)
+import useEcomStore from "../store/ecom-store";
 import { addressUserCart, listUserCart } from "../api/user";
-import Swal from "sweetalert2";
 import Payment from "./user/Payment";
 import numberFormat from "../components/utility/number";
 
 const CheckOut = () => {
-  // Zustand
   const token = useEcomStore((state) => state.token);
   const actionUpdateUser = useEcomStore((state) => state.actionUpdateUser);
-  // fly to
   const navigate = useNavigate();
-  // State
+
   const [products, setProducts] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [netTotal, setNetTotal] = useState(0);
   const [vat, setVat] = useState(0);
-  // state address
+
   const [address, setAddress] = useState({
     address: "",
     email: "",
@@ -32,7 +38,7 @@ const CheckOut = () => {
       fetchData(token);
     }
   }, [token]);
-  // FetchData
+
   const fetchData = async (token) => {
     try {
       const res = await listUserCart(token);
@@ -45,16 +51,15 @@ const CheckOut = () => {
       console.log(error);
     }
   };
-  // Set - address
+
   const handleChangeAddress = (e) => {
     setAddress({
       ...address,
       [e.target.name]: e.target.value,
     });
   };
-  // Handle Confirm Order
+
   const handleSaveAddress = async () => {
-    // validate
     if (
       !address.address ||
       !address.email ||
@@ -63,16 +68,14 @@ const CheckOut = () => {
     ) {
       return false;
     }
-
     try {
-      // Update to DB
       await addressUserCart(token, address);
       actionUpdateUser({
         name: address.name,
         address: address.address,
         phoneNumber: address.phoneNumber,
       });
-      return true; // true - record
+      return true;
     } catch (error) {
       console.log(error);
       return false;
@@ -80,76 +83,134 @@ const CheckOut = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-12 font-sans">
+    <div className="bg-gray-50 min-h-screen py-8 md:py-12 font-sans text-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb / Back Button */}
+        {/* Breadcrumb */}
         <button
           onClick={() => navigate("/shop")}
-          className="flex items-center gap-2 text-sm text-slate-500 hover:text-indigo-600 mb-8 transition-colors"
+          className="group flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600 mb-6 transition-colors"
         >
-          <ChevronLeft size={16} /> Back to Shop
+          <div className="p-1 rounded-full bg-white group-hover:bg-indigo-50 border border-slate-200 transition-colors">
+            <ChevronLeft size={16} />
+          </div>
+          Back to Shop
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">
+          Checkout
+        </h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* --- LEFT COLUMN: Forms --- */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* 1. Shipping Address */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <MapPin className="text-indigo-600" /> Shipping Address
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+          <div className="lg:col-span-7 space-y-6">
+            {/* 1. Shipping Address Card */}
+            {/* ✨ FIX: เพิ่ม overflow-hidden เพื่อตัดส่วนเกินทิ้ง */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                  <MapPin size={24} />
+                </div>
+                <h2 className="text-lg font-bold text-slate-800">
+                  Shipping Address
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="md:col-span-2 relative">
+                  <label className="text-xs font-semibold text-gray-500 ml-1 mb-1 block uppercase tracking-wider">
                     Full Name
                   </label>
-                  <input
-                    onChange={handleChangeAddress}
-                    name="name"
-                    type="text"
-                    placeholder="John Doe"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
-                  />
+                  <div className="relative">
+                    <User
+                      className="absolute left-4 top-3.5 text-gray-400"
+                      size={18}
+                    />
+                    {/* ✨ FIX: ใส่ box-border และ w-full เพื่อกันล้น */}
+                    <input
+                      onChange={handleChangeAddress}
+                      name="name"
+                      type="text"
+                      placeholder="John Doe"
+                      className="w-full box-border pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm sm:text-base placeholder:text-gray-400"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Phone Number
+
+                <div className="relative">
+                  <label className="text-xs font-semibold text-gray-500 ml-1 mb-1 block uppercase tracking-wider">
+                    Phone
                   </label>
-                  <input
-                    onChange={handleChangeAddress}
-                    name="phoneNumber"
-                    type="text"
-                    placeholder="081-234-5678"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
-                  />
+                  <div className="relative">
+                    <Phone
+                      className="absolute left-4 top-3.5 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      onChange={handleChangeAddress}
+                      name="phoneNumber"
+                      type="text"
+                      placeholder="081-xxx-xxxx"
+                      className="w-full box-border pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm sm:text-base placeholder:text-gray-400"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Email Address
+
+                <div className="relative">
+                  <label className="text-xs font-semibold text-gray-500 ml-1 mb-1 block uppercase tracking-wider">
+                    Email
                   </label>
-                  <input
-                    onChange={handleChangeAddress}
-                    name="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-300 placeholder-opacity-60"
-                  />
+                  <div className="relative">
+                    <Mail
+                      className="absolute left-4 top-3.5 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      onChange={handleChangeAddress}
+                      name="email"
+                      type="email"
+                      placeholder="john@example.com"
+                      className="w-full box-border pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm sm:text-base placeholder:text-gray-400"
+                    />
+                  </div>
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Address
+
+                <div className="md:col-span-2 relative">
+                  <label className="text-xs font-semibold text-gray-500 ml-1 mb-1 block uppercase tracking-wider">
+                    Delivery Address
                   </label>
-                  <textarea
-                    onChange={handleChangeAddress}
-                    name="address"
-                    rows="3"
-                    placeholder="123 Street, District, Province, Zip Code"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-all resize-none placeholder-slate-300 placeholder-opacity-60"
-                  />
+                  <div className="relative">
+                    <Home
+                      className="absolute left-4 top-4 text-gray-400"
+                      size={18}
+                    />
+                    <textarea
+                      onChange={handleChangeAddress}
+                      name="address"
+                      rows="3"
+                      placeholder="House No, Street, District, Province, Zip Code"
+                      className="w-full box-border pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm sm:text-base resize-none placeholder:text-gray-400"
+                    />
+                  </div>
                 </div>
               </div>
-              {/* Payment Stripe */}
-              <div className="mt-5">
+            </div>
+
+            {/* 2. Payment Section */}
+            {/* ✨ FIX: ลบ Card Wrapper (bg-white, p-6, shadow) ออกจากตรงนี้ 
+               เพื่อไม่ให้ซ้อนกับ Card ของ CheckoutForm ตัวข้างใน
+               ถ้าตัวข้างใน (Stripe) มีกรอบอยู่แล้ว มันจะวางลงไปพอดีครับ */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                  <CreditCard size={24} />
+                </div>
+                <h2 className="text-lg font-bold text-slate-800">
+                  Payment Method
+                </h2>
+              </div>
+
+              {/* Wrapper สำหรับ Payment: ใส่แค่ w-full */}
+              <div className="w-full">
                 <Payment
                   address={address}
                   handleSaveAddress={handleSaveAddress}
@@ -158,97 +219,84 @@ const CheckOut = () => {
             </div>
           </div>
 
-          {/* --- RIGHT COLUMN: Order Summary (Ultra Minimal - Text Only) --- */}
-          <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-              <h2 className="text-xl font-bold text-slate-800 mb-6">
-                Order Summary
-              </h2>
+          {/* --- RIGHT COLUMN: Summary --- */}
+          <div className="lg:col-span-5">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl shadow-indigo-900/5 border border-gray-100 sticky top-6">
+              <div className="flex items-center gap-3 mb-6">
+                <ShoppingBag className="text-indigo-600" size={20} />
+                <h2 className="text-xl font-bold text-slate-800">
+                  Order Summary
+                </h2>
+                <span className="ml-auto bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full">
+                  {products.length} Items
+                </span>
+              </div>
 
-              {/* 1. Product List (Text Only) */}
-              <div className="space-y-6 mb-8 max-h-320px overflow-y-auto pr-4 custom-scrollbar font-medium">
+              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {products.map((item, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-start group py-1"
+                    className="flex justify-between items-start group"
                   >
-                    {/* Info (No Image) */}
-                    <div className="flex-1 pr-4">
-                      <h4 className="text-sm font-bold text-slate-700 leading-tight">
-                        {item.product?.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-1.5 font-normal">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">
-                          x{item.count}
-                        </span>
-                        <span> ฿{numberFormat(item.price)}</span>
+                    <div className="flex gap-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-700 line-clamp-2">
+                          {item.product?.title}
+                        </h4>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Qty: {item.count} x ฿{numberFormat(item.price)}
+                        </p>
                       </div>
                     </div>
-
-                    {/* Item Total */}
-                    <span className="text-sm font-bold text-slate-800 font-mono">
-                      ฿{(item.price * item.count).toLocaleString()}
+                    <span className="text-sm font-bold text-slate-800">
+                      ฿{numberFormat(item.price * item.count)}
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Divider (Solid thin) */}
-              <div className="border-t border-slate-100 my-6"></div>
-              {/* 2. Calculation Details */}
-              <div className="space-y-3 text-sm font-medium">
-                {/* Subtotal */}
-                <div className="flex justify-between text-slate-500">
+              <div className="border-t border-dashed border-gray-200 my-6"></div>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
-                  <span className="text-slate-700">
+                  <span className="font-medium text-slate-700">
                     ฿{numberFormat(cartTotal)}
                   </span>
                 </div>
-                {/* Shipping */}
-                <div className="flex justify-between text-slate-500">
+                <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
-                  <span className="text-emerald-600">{shipping}</span>
+                  <span className="font-medium text-emerald-600">
+                    {shipping === 0 ? "Free" : `฿${shipping}`}
+                  </span>
                 </div>
-                {/* VAT */}
-                <div className="flex justify-between text-slate-500">
+                <div className="flex justify-between text-gray-500">
                   <span>VAT (7%)</span>
-                  <span className="text-slate-700">฿{numberFormat(vat)}</span>
+                  <span className="font-medium text-slate-700">
+                    ฿{numberFormat(vat)}
+                  </span>
                 </div>
               </div>
 
-              {/* Divider (Solid thick) */}
-              <div className="border-t-2 border-slate-800/5 my-6"></div>
-
-              {/* 3. Grand Total */}
-              <div className="flex justify-between items-end mb-8">
+              <div className="mt-6 bg-slate-900 rounded-xl p-4 flex justify-between items-center text-white shadow-lg shadow-slate-900/20">
                 <div>
-                  <span className="text-base font-black text-slate-800 block uppercase tracking-wider">
-                    Total
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    THB (Inc. VAT)
-                  </span>
+                  <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold">
+                    Grand Total
+                  </p>
+                  <p className="text-sm text-slate-400">Net Payment</p>
                 </div>
-                {/* Total */}
-                <span className="text-3xl font-black text-indigo-700 tracking-tight font-mono leading-none">
+                <span className="text-2xl font-bold tracking-tight">
                   ฿{numberFormat(netTotal)}
                 </span>
               </div>
-              <p className="text-center text-xs text-slate-400 mt-4">
-                By confirming, you agree to our Terms & Conditions.
-              </p>
-              {/* Action Button */}
-              {/* <button
-                onClick={hldConfirmOrder}
-                disabled={isLoading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  "Confirm Payment"
-                )}
-              </button> */}
+
+              <div className="mt-6 text-center">
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Your personal data will be used to process your order, support
+                  your experience throughout this website, and for other
+                  purposes described in our privacy policy.
+                </p>
+              </div>
             </div>
           </div>
         </div>

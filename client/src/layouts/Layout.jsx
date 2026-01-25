@@ -7,11 +7,11 @@ import CartDrawer from "../components/card/CardDrawer";
 const Layout = () => {
   return (
     <>
-      <div>
+      <div className="flex flex-col min-h-screen">
         <MainNav />
         <CartDrawer />
         <PageHeader />
-        <main>
+        <main className="grow container mx-auto px-4 py-6 md:px-8">
           <Outlet />
         </main>
         <FoodBar />

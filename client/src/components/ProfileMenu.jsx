@@ -1,31 +1,76 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useEcomStore from "../store/ecom-store";
 import {
   User,
-  Settings,
   LogOut,
   ChevronDown,
-  CreditCard,
-  History,
+  LayoutDashboard,
+  FileText,
+  Heart,
+  MapPin,
+  ClipboardList,
+  PackagePlus,
+  Users,
+  Settings,
 } from "lucide-react";
-import useEcomStore from "../store/ecom-store";
-import { useNavigate } from "react-router-dom";
 
 const ProfileMenu = () => {
-  //Zustand
   const logout = useEcomStore((state) => state.logout);
   const user = useEcomStore((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
-  // function - logout
-  const hldLogOut = () => {
+  // --- Configuration: List 🐳 ---
+
+  // 1. Menu User 💕
+  const userMenus = [
+    { label: "My Profile", icon: <User size={18} />, link: "/user/profile" },
+    {
+      label: "Order History",
+      icon: <FileText size={18} />,
+      link: "/user/history",
+    },
+    { label: "Wishlist", icon: <Heart size={18} />, link: "/user/wishlist" },
+    { label: "My Address", icon: <MapPin size={18} />, link: "/user/address" },
+  ];
+
+  // 2. Menu Admin 🧑‍💼
+  const adminMenus = [
+    {
+      label: "Dashboard",
+      icon: <LayoutDashboard size={18} />,
+      link: "/admin",
+    },
+    {
+      label: "Manage Orders",
+      icon: <ClipboardList size={18} />,
+      link: "/admin/orders",
+    },
+    {
+      label: "Manage Products",
+      icon: <PackagePlus size={18} />,
+      link: "/admin/product",
+    },
+    {
+      label: "Manage Users",
+      icon: <Users size={18} />,
+      link: "/admin/manage",
+    },
+  ];
+
+  const avatarSrc = user?.picture
+    ? user.picture
+    : user?.role === "admin"
+      ? "https://cdn-icons-png.flaticon.com/512/5836/5836504.png" // 👨‍💼 รูป Admin (ใส่สูท/ทางการ)
+      : "https://png.pngtree.com/element_our/20190529/ourlarge/pngtree-flat-user-pattern-round-image_1200090.jpg"; // 🙍‍♂️ รูป User (น่ารัก/ทั่วไป)
+  const handleLogout = () => {
     logout();
     setIsOpen(false);
-    navigate("/login");
+    navigate("/");
   };
 
-  // Logic
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -33,82 +78,92 @@ const ProfileMenu = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuRef]);
 
   return (
-    <div className="relative" ref={menuRef}>
-      {/* ปุ่ม Trigger */}
+    <div className="relative z-50" ref={menuRef}>
+      {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 p-1 rounded-full transition-all duration-300 hover:bg-gray-100 focus:outline-none"
+        className="group flex items-center gap-2 sm:gap-3 p-1 pr-2 rounded-full hover:bg-indigo-50 transition-all focus:ring-2 focus:ring-indigo-100"
       >
-        <div className="relative">
-          <img
-            className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
-            src="https://i.ibb.co/08rJb0w/Avatar.png" // ยังไม่มีรูปใน DB
-            alt="User Avatar"
-          />
-          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
-        </div>
-
-        <div className="hidden md:flex flex-col items-start mr-1">
-          <span className="text-sm font-medium text-gray-700">
-            {user?.name || user?.email}
+        {/* img */}
+        <img
+          className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm group-hover:border-indigo-200"
+          src={avatarSrc}
+          alt="User Avatar"
+        />
+        <div className="hidden md:flex flex-col items-start">
+          <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-700">
+            {user?.name || "User"}
           </span>
-          <span className="text-[10px] text-gray-400">{user?.role}</span>
+          <span className="text-[10px] text-gray-400 uppercase">
+            {user?.role}
+          </span>
         </div>
-
         <ChevronDown
           size={16}
-          className={`text-gray-400 transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`text-gray-400 group-hover:text-indigo-500 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Content */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 animate-fade-in-up">
-          <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-            <p className="text-sm font-medium text-gray-900">
-              {user?.email ? "Welcome back" : "Welcome Guest"}
+        <div className="absolute right-0 mt-3 w-64 origin-top-right bg-white rounded-2xl shadow-xl shadow-indigo-100/50 border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Header */}
+          <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <p className="text-sm font-bold text-gray-900 truncate">
+              {user?.email}
             </p>
-            <p className="text-xs text-gray-500 truncate">
-              {user?.email || "Guest"}
-            </p>
+            <p className="text-xs text-gray-500">Welcome back!</p>
           </div>
 
-          <ul className="py-2">
-            <MenuItem
-              icon={<User size={16} />}
-              text="My Profile"
-              onClick={() => navigate("/user")}
-            />
-            <MenuItem
-              icon={<CreditCard size={16} />}
-              text="Billing"
-              onClick={() => navigate("/user/billing")}
-            />
-            <MenuItem
-              icon={<History size={16} />}
-              text="History"
-              onClick={() => navigate("/user/history")}
-            />
-            <MenuItem
-              icon={<Settings size={16} />}
-              text="Settings"
-              onClick={() => navigate("/user/edit-profile")}
-            />
+          {/* Dynamic Menu List */}
+          <ul className="p-2 space-y-1">
+            {/* ถ้าเป็น ADMIN ให้โชว์เมนู Admin */}
+            {user?.role === "admin" ? (
+              <>
+                <div className="px-3 py-1 text-xs font-semibold text-indigo-500 uppercase tracking-wider">
+                  Admin Panel
+                </div>
+                {adminMenus.map((item, index) => (
+                  <MenuItem
+                    key={index}
+                    {...item}
+                    onClick={() => {
+                      setIsOpen(false);
+                      navigate(item.link);
+                    }}
+                    highlight // ใส่สีให้รู้ว่าเป็นเมนู Admin
+                  />
+                ))}
+                <div className="my-1 border-t border-gray-100 mx-2"></div>
+              </>
+            ) : (
+              // ถ้าเป็น USER ให้โชว์เมนู User
+              userMenus.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  {...item}
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate(item.link);
+                  }}
+                />
+              ))
+            )}
 
-            <div className="my-1 border-t border-gray-100"></div>
+            {/* ปุ่ม Logout (มีทุก Role) */}
+            {user?.role !== "admin" && (
+              <div className="my-1 border-t border-gray-100 mx-2"></div>
+            )}
+
             <MenuItem
-              icon={<LogOut size={16} />}
-              text="Log Out"
+              icon={<LogOut size={18} />}
+              label="Sign Out"
               isDanger
-              onClick={hldLogOut}
+              onClick={handleLogout}
             />
           </ul>
         </div>
@@ -117,20 +172,34 @@ const ProfileMenu = () => {
   );
 };
 
-const MenuItem = ({ icon, text, onClick, isDanger = false }) => {
+// Sub-Component เพื่อลดโค้ดซ้ำ
+const MenuItem = ({ icon, label, onClick, isDanger, highlight }) => {
   return (
     <li>
       <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-200
-        ${
-          isDanger
-            ? "text-red-600 hover:bg-red-50"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-        }`}
+        className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all
+          ${
+            isDanger
+              ? "text-red-600 hover:bg-red-50"
+              : highlight
+                ? "text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
+                : "text-gray-600 hover:bg-gray-100 hover:text-indigo-600"
+          }
+        `}
       >
-        {icon}
-        {text}
+        <span
+          className={
+            isDanger
+              ? "text-red-500"
+              : highlight
+                ? "text-indigo-600"
+                : "text-gray-400"
+          }
+        >
+          {icon}
+        </span>
+        {label}
       </button>
     </li>
   );

@@ -185,7 +185,7 @@ const useEcomStore = create(
   persist(ecomStore, {
     name: "ecom-store",
     storage: createJSONStorage(() => localStorage),
-  })
+  }),
 );
 
 export default useEcomStore;

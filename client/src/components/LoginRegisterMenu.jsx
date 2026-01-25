@@ -2,20 +2,37 @@ import { Link } from "react-router-dom";
 
 const LoginRegisterMenu = () => {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-3">
+      {/* --- LOGIN BUTTON --- 
+        Mobile: ซ่อนขอบ/พื้นหลัง เน้นประหยัดที่
+        Desktop: ดู Clean สบายตา
+      */}
       <Link
-        to={"/login"}
-        className="relative group text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors duration-300"
+        to="/login"
+        className="
+          rounded-full px-3 py-2 text-xs font-bold text-gray-600 transition-all 
+          hover:bg-indigo-50 hover:text-indigo-600
+          sm:px-4 sm:text-sm
+        "
       >
-        LOGIN
-        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-300 group-hover:w-full"></span>
+        Log in
       </Link>
 
+      {/* --- REGISTER BUTTON --- 
+        Mobile: ปุ่มเด่นแต่ขนาดกะทัดรัด
+        Desktop: ปุ่มใหญ่ มีเงาสวยงาม
+      */}
       <Link
-        to={"/register"}
-        className="px-5 py-2 text-sm font-medium text-white bg-gray-900 rounded-full hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-200 transition-all duration-300 transform active:scale-95"
+        to="/register"
+        className="
+          rounded-full bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-200 
+          transition-all duration-300
+          hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-300 hover:-translate-y-0.5
+          active:scale-95 active:shadow-none
+          sm:px-6 sm:py-2.5 sm:text-sm
+        "
       >
-        REGISTER
+        Sign up
       </Link>
     </div>
   );
