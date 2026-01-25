@@ -43,6 +43,18 @@ const router = createBrowserRouter([
     ],
   },
   {
+    // User  🐽
+    path: "/user",
+    element: <ProtectRouteUser element={<LayoutUser />} />,
+    children: [
+      { index: true, element: <UserProfile /> },
+      { path: "edit-profile", element: <EditProfile /> },
+      { path: "billing", element: <Billing /> },
+      { path: "payment", element: <Payment /> },
+      { path: "history", element: <History /> },
+    ],
+  },
+  {
     // admin  ☕️
     path: "/admin",
     element: <ProtectRouteAdmin element={<LayoutAdmin />} />,
@@ -53,18 +65,6 @@ const router = createBrowserRouter([
       { path: "product/:id", element: <EditProduct /> },
       { path: "manage", element: <Manage /> },
       { path: "orders", element: <ManageOrders /> },
-    ],
-  },
-  {
-    // User  🐽
-    path: "/user",
-    element: <ProtectRouteUser element={<LayoutUser />} />,
-    children: [
-      { index: true, element: <UserProfile /> },
-      { path: "edit-profile", element: <EditProfile /> },
-      { path: "billing", element: <Billing /> },
-      { path: "payment", element: <Payment /> },
-      { path: "history", element: <History /> },
     ],
   },
 ]);

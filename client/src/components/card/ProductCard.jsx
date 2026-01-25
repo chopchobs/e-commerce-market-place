@@ -1,39 +1,44 @@
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart, Heart, Star } from "lucide-react"; // Import Star เพิ่ม
 import NewProduct from "./NewProduct";
 import useEcomStore from "../../store/ecom-store";
 import numberFormat from "../utility/number";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
+
 const ProductCard = ({ item }) => {
   // Store
   const actionAddToCart = useEcomStore((state) => state.actionAddToCart);
   const navigate = useNavigate();
 
-  // function Product  - detail
+  // Navigation
   const handleCardClick = () => {
-    navigate(`/product/${item.id}`); // เดียวมาทำ
+    navigate(`/product/${item.id}`);
   };
-  // function Cart (หยุดไม่ให้ทะลุไปหา Card)
+
+  // Add to Cart
   const handleAddToCart = (e) => {
-    e.stopPropagation(); // 👈 ⛔️ หยุด Event
+    e.stopPropagation();
     actionAddToCart(item);
   };
-  // function Heart (หยุดไม่ให้ทะลุ)
+
+  // Wishlist
   const handleWishlist = (e) => {
-    e.stopPropagation(); // 👈 ⛔️ หยุด Event
+    e.stopPropagation();
     console.log("Add to wishlist");
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.03 }}
+      whileHover={{ y: -5 }} // ✨ ขยับขึ้นนิดนึงตอน Hover ให้ดูมีมิติ
       onClick={handleCardClick}
-      className="group relative bg-white rounded-xl overflow-hidden border border-transparent hover:border-indigo-100 hover:shadow-xl transition-all duration-300 cursor-pointer"
+      className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-indigo-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 cursor-pointer h-full flex flex-col"
     >
-      {/* Image Container */}
-      <div className="relative w-full aspect-3/4 bg-slate-200 overflow-hidden">
+      {/* ================= IMAGE SECTION ================= */}
+      <div className="relative w-full aspect-3/4 bg-slate-100 overflow-hidden">
+        {/* Product Image */}
         <img
           src={
             item.images && item.images.length > 0
@@ -41,49 +46,71 @@ const ProductCard = ({ item }) => {
               : "https://placehold.co/400x600?text=No+Image"
           }
           alt={item.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
 
-        {/* Badge: New ( createdAt - 7days for new) */}
-        <NewProduct item={item} />
+        {/* Badge: New */}
+        <div className="absolute top-2 left-2 z-10">
+          <NewProduct item={item} />
+        </div>
 
-        {/* Hover Actions */}
-        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[1px]">
+        {/* ❤️ Wishlist Button (Mobile: Show Top-Right, Desktop: Show on Hover) */}
+        <button
+          onClick={handleWishlist}
+          className="absolute top-2 right-2 p-2 rounded-full bg-white/80 backdrop-blur-sm text-slate-400 hover:text-red-500 hover:bg-white transition-all shadow-sm md:opacity-0 md:group-hover:opacity-100 md:translate-x-4 md:group-hover:translate-x-0 duration-300"
+        >
+          <Heart size={18} />
+        </button>
+
+        {/* 🛒 Desktop Hover Action (ซ่อนในมือถือ) */}
+        <div className="hidden md:flex absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-end justify-center pb-6">
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleAddToCart}
-            className="bg-white p-3 rounded-full text-slate-800 hover:bg-indigo-600 hover:text-white shadow-lg translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75"
-            title="Add to Cart"
+            className="flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-full font-bold shadow-xl hover:bg-indigo-600 hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300"
           >
-            <ShoppingCart size={20} />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleWishlist}
-            className="bg-white p-3 rounded-full text-slate-800 hover:bg-red-500 hover:text-white shadow-lg translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100"
-            title="Wishlist"
-          >
-            <Heart size={20} />
+            <ShoppingCart size={18} />
+            Quick Add
           </motion.button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <p className="text-xs text-slate-500 mb-1">
-          {/* ⭐ ใส่ ?. กันพังกรณีไม่มีหมวดหมู่ */}
-          {item.category?.name || "UnCategorized"}
-        </p>
-        <h3 className="font-semibold text-slate-800 text-base truncate group-hover:text-indigo-600 transition-colors cursor-pointer">
-          {item.title}
-        </h3>
-        <div className="flex items-center justify-between mt-2">
-          <span className="font-bold text-lg text-slate-900">
-            ฿{numberFormat(item.price)} THB
-          </span>
-          <div className="flex gap-1 text-yellow-400 text-xs">★★★★☆ (12)</div>
+      {/* ================= CONTENT SECTION ================= */}
+      <div className="p-4 flex flex-col grow justify-between">
+        <div>
+          {/* Category */}
+          <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">
+            {item.category?.name || "General"}
+          </p>
+
+          {/* Title */}
+          <h3 className="font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
+            {item.title}
+          </h3>
+        </div>
+
+        {/* Price & Mobile Cart Row */}
+        <div className="flex items-end justify-between mt-2">
+          <div className="flex flex-col">
+            {/* Rating */}
+            <div className="flex items-center gap-1 mb-1">
+              <Star size={12} className="text-yellow-400 fill-yellow-400" />
+              <span className="text-xs text-slate-400">(4.5)</span>
+            </div>
+            {/* Price */}
+            <span className="font-bold text-base sm:text-lg text-indigo-900">
+              ฿{numberFormat(item.price)}
+            </span>
+          </div>
+
+          {/* 🛒 Mobile Cart Button (แสดงเฉพาะมือถือ md:hidden) */}
+          <button
+            onClick={handleAddToCart}
+            className="md:hidden p-2.5 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors active:scale-95"
+          >
+            <ShoppingCart size={20} />
+          </button>
         </div>
       </div>
     </motion.div>

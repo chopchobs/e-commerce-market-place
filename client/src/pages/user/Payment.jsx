@@ -30,7 +30,7 @@ const Payment = ({ address, handleSaveAddress }) => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {/* Check for clientSecret that have or not */}
       {clientSecret && (
         <Elements options={option} stripe={stripePromise}>

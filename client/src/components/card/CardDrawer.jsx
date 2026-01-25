@@ -15,10 +15,10 @@ const CartDrawer = () => {
   const isOpen = useEcomStore((state) => state.isOpen);
   const cart = useEcomStore((state) => state.carts);
   const actionUpdateQuantity = useEcomStore(
-    (state) => state.actionUpdateQuantity
+    (state) => state.actionUpdateQuantity,
   );
   const actionRemoveProduct = useEcomStore(
-    (state) => state.actionRemoveProduct
+    (state) => state.actionRemoveProduct,
   );
   const actionTotalPrice = useEcomStore((state) => state.actionTotalPrice);
 
@@ -62,7 +62,7 @@ const CartDrawer = () => {
 
       {/* 3. Drawer (Body Cart) */}
       <div
-        className={`relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`relative w-full max-w-md bg-white h-dvh shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
