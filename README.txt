@@ -95,9 +95,6 @@ npx prisma db push
 
 /* Enjoy */
 --------- Deploy Server to Render ------
-
-
-
 --------- Deploy Client to Vercel ------
 
 /* Enjoy */
