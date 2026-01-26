@@ -6,7 +6,6 @@ const {
   ListProduct,
   RemoveProduct,
   ReadProduct,
-  ListProductByFilters,
   SearchFilter,
   UploadImages,
   RemoveImage,
