@@ -5,11 +5,13 @@
 
 แพลตฟอร์ม E-Commerce แบบ Full-Stack ที่พัฒนาด้วย **PERN Stack** (PostgreSQL, Express, React, Node.js) รองรับการจัดการสินค้า ตะกร้าสินค้า และระบบชำระเงินจริงผ่าน Stripe พร้อมระบบ Back-office สำหรับผู้ดูแลระบบ
 
-## 🚀 Live Demo
+## 🚀 Live Demo & Links
 
-- **Frontend (Vercel):** [Click to Visit](https://e-commerce-market-place-nine.vercel.app/)
-- **Backend API (Render):** [API Documentation](https://my-ecommerce-api-p5zj.onrender.com)
-  > _Note: Backend Base URL. Try accessing endpoints like `/api/products/10` to see data._
+- **Frontend (Vercel):** [e-commerce-market-place.vercel.app](https://e-commerce-market-place-nine.vercel.app/)
+- **Backend API (Render):** [my-ecommerce-api.onrender.com](https://my-ecommerce-api-p5zj.onrender.com)
+  > _Note: Try accessing endpoints like `/api/products/10` to see the JSON response._
+
+> **⚠️ Important Note:** The backend API is deployed on Render's free tier, which automatically spins down after a period of inactivity. **The initial load or first request may take around 30-50 seconds to wake the server up.** Thank you for your patience! 🙏
 
 ---
 
