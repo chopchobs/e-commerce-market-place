@@ -226,6 +226,6 @@ npm run dev
 
 - 💼 **LinkedIn:**[ \[ LinkedIn \]](https://www.linkedin.com/in/nattapon-sopontanapat-8b98832a5/)
 - 🐙 **GitHub:** https://github.com/chopchobs
-- 📧 **Email:** iuiowerchop@hotmail.com
+- 📧 **Email:** nattapon_Sopontanapat@hotmail.com
 
 ---
